@@ -1,4 +1,6 @@
-public class TestTurret : Turret
+using System.Collections;
+
+public class TestTurret : Turret, ITurretEffect
 {
     protected override void Shoot()
     {
@@ -6,5 +8,10 @@ public class TestTurret : Turret
 
     public override void Upgrade()
     {
+    }
+
+    IEnumerator ITurretEffect.ApplyEffect()
+    {
+        throw new System.NotImplementedException();
     }
 }
