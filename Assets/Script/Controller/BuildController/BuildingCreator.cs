@@ -9,7 +9,7 @@ using UnityEngine.Tilemaps;
 public class BuildingCreator : Singleton<BuildingCreator>
 {
     [SerializeField] Tilemap previewMap, defaultMap;
-    InputSystem_Actions _input;
+    PlayerInput _input;
 
     [SerializeField] List<Tilemap> forbidPlacingWithMaps;
 
@@ -41,7 +41,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
     protected override void Awake()
     {
         base.Awake();
-        _input = new InputSystem_Actions();
+        _input = new PlayerInput();
         _camera = Camera.main;
 
     }
