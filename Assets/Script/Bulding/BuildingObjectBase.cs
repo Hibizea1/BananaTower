@@ -1,6 +1,10 @@
+#region
+
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+
+#endregion
 
 public enum Category
 {
@@ -20,15 +24,10 @@ public class BuildingObjectBase : ScriptableObject
     [SerializeField] bool usePlacementRestriction;
     [SerializeField] List<BuildingCategory> placementRestriction = new List<BuildingCategory>();
 
-    public List<BuildingCategory> PlacementRestriction
-    {
-        get
-        {
-            return usePlacementRestriction ? placementRestriction : category.PlacementRestriction;
-        }
-    }
-    
-    
+    public List<BuildingCategory> PlacementRestriction =>
+        usePlacementRestriction ? placementRestriction : category.PlacementRestriction;
+
+
     public TileBase Tile => tileBase;
 
     public BuildingCategory Category => category;
@@ -36,4 +35,6 @@ public class BuildingObjectBase : ScriptableObject
     public PlaceType PlaceType => placeType;
 
     public UiCategory UiCategory => uiCategory;
+
+    public bool UsePlacementRestriction => usePlacementRestriction;
 }

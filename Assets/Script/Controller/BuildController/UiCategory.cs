@@ -1,9 +1,13 @@
+#region
+
 using UnityEngine;
+
+#endregion
 
 [CreateAssetMenu(fileName = "UICategory", menuName = "LevelBuilding/Create UI Category")]
 public class UiCategory : ScriptableObject
 {
-    [SerializeField] int siblingIndex = 0;
+    [SerializeField] int siblingIndex;
     [SerializeField] Color backgroundColor;
 
     public int SiblingIndex => siblingIndex;

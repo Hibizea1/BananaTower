@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41f7653873e0071449521948dbd09438, type: 3}
   m_Name: BanaSnipe
   m_EditorClassIdentifier: 
-  category: {fileID: 0}
-  uiCategory: {fileID: 0}
-  tileBase: {fileID: 0}
-  placeType: 0
+  category: {fileID: 11400000, guid: 56794ddf5da15934d967c613fb99e3a6, type: 2}
+  uiCategory: {fileID: 11400000, guid: 499823653af7d0d49a720218e89252b6, type: 2}
+  tileBase: {fileID: 11400000, guid: 41220921f899b824b9f551bf92cb8240, type: 2}
+  placeType: 1
   usePlacementRestriction: 0
   placementRestriction: []

@@ -1,5 +1,8 @@
-using System;
+#region
+
 using UnityEngine;
+
+#endregion
 
 enum ToolType
 {
@@ -19,14 +22,14 @@ public class BuildingTool : BuildingObjectBase
 
     public void Use(Vector3Int position)
     {
-        ToolController t = ToolController.GetInstance();
+        var t = ToolController.GetInstance();
 
         switch (toolType)
         {
             case ToolType.Eraser:
                 t.Eraser(position);
                 break;
-           default:
+            default:
                 Debug.Log("ToolTip Not set");
                 break;
         }

@@ -1,11 +1,15 @@
-using System;
+#region
+
 using UnityEngine;
+
+#endregion
 
 public class TooltipSystem : MonoBehaviour
 {
-    private static TooltipSystem sCurrent;
+    static TooltipSystem sCurrent;
 
-    [SerializeField] private Tooltip Tooltip;
+    [SerializeField] Tooltip Tooltip;
+
     public void Awake()
     {
         sCurrent = this;

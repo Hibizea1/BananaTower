@@ -1,11 +1,15 @@
+#region
+
 using System.Collections;
 using UnityEngine;
 
+#endregion
+
 public class TooltipTriggerGameObject : MonoBehaviour
 {
-    [SerializeField] private string Header;
-    [SerializeField] private string Content;
-    private Coroutine showTooltipCoroutine;
+    [SerializeField] string Header;
+    [SerializeField] string Content;
+    Coroutine showTooltipCoroutine;
 
 
     public void OnMouseEnter()
@@ -15,15 +19,12 @@ public class TooltipTriggerGameObject : MonoBehaviour
 
     public void OnMouseExit()
     {
-        if (showTooltipCoroutine != null)
-        {
-            StopCoroutine(showTooltipCoroutine);
-        }
+        if (showTooltipCoroutine != null) StopCoroutine(showTooltipCoroutine);
 
         TooltipSystem.Hide();
     }
 
-    private IEnumerator ShowTooltipWithDelay()
+    IEnumerator ShowTooltipWithDelay()
     {
         yield return new WaitForSeconds(0.5f);
         TooltipSystem.Show(Content, Header);

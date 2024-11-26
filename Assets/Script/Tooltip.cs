@@ -1,15 +1,31 @@
-using System;
+#region
+
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-[ExecuteInEditMode()]
+#endregion
+
+[ExecuteInEditMode]
 public class Tooltip : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI HeaderField;
-    [SerializeField] private TextMeshProUGUI ContentField;
-    [SerializeField] private LayoutElement LayoutElement;
-    [SerializeField] private int CharacterWrapLimit;
+    [SerializeField] TextMeshProUGUI HeaderField;
+    [SerializeField] TextMeshProUGUI ContentField;
+    [SerializeField] LayoutElement LayoutElement;
+    [SerializeField] int CharacterWrapLimit;
+
+
+    void Update()
+    {
+        if (Application.isEditor)
+        {
+            var headerLength = HeaderField.text.Length;
+            var contentLength = ContentField.text.Length;
+
+            LayoutElement.enabled =
+                headerLength > CharacterWrapLimit || contentLength > CharacterWrapLimit ? true : false;
+        }
+    }
 
 
     public void SetText(string _content, string _header = "")
@@ -28,23 +44,10 @@ public class Tooltip : MonoBehaviour
 
         ContentField.text = _content;
 
-        int headerLength = HeaderField.text.Length;
-        int contentLength = ContentField.text.Length;
+        var headerLength = HeaderField.text.Length;
+        var contentLength = ContentField.text.Length;
 
         LayoutElement.enabled =
-            (headerLength > CharacterWrapLimit || contentLength > CharacterWrapLimit) ? true : false;
-    }
-
-
-    private void Update()
-    {
-        if (Application.isEditor)
-        {
-            int headerLength = HeaderField.text.Length;
-            int contentLength = ContentField.text.Length;
-
-            LayoutElement.enabled =
-                (headerLength > CharacterWrapLimit || contentLength > CharacterWrapLimit) ? true : false;
-        }
+            headerLength > CharacterWrapLimit || contentLength > CharacterWrapLimit ? true : false;
     }
 }

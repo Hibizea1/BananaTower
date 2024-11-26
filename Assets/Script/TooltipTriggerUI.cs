@@ -1,15 +1,21 @@
+#region
+
+using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using System.Collections;
+
+#endregion
 
 public class TooltipTriggerUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    [SerializeField] private string Header;
-    [SerializeField] private string Content;
-    // private DefaultSlot slot;
-    private Coroutine showTooltipCoroutine;
+    [SerializeField] string Header;
 
-    private void Start()
+    [SerializeField] string Content;
+
+    // private DefaultSlot slot;
+    Coroutine showTooltipCoroutine;
+
+    void Start()
     {
         //slot = GetComponent<DefaultSlot>();
     }
@@ -43,10 +49,9 @@ public class TooltipTriggerUI : MonoBehaviour, IPointerEnterHandler, IPointerExi
         TooltipSystem.Hide();
     }
 
-    private IEnumerator ShowTooltipWithDelay()
+    IEnumerator ShowTooltipWithDelay()
     {
         yield return new WaitForSeconds(0.5f);
         TooltipSystem.Show(Content, Header);
     }
-
 }

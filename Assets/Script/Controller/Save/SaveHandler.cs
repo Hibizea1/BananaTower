@@ -1,14 +1,18 @@
+#region
+
 using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+#endregion
+
 public class SaveHandler : Singleton<SaveHandler>
 {
-    readonly Dictionary<string, Tilemap> _tilemaps = new Dictionary<string, Tilemap>();
     [SerializeField] BoundsInt bounds;
     [SerializeField] string fileName = "TilemapData.JSON";
+    readonly Dictionary<string, Tilemap> _tilemaps = new Dictionary<string, Tilemap>();
 
     void Start()
     {
@@ -19,41 +23,36 @@ public class SaveHandler : Singleton<SaveHandler>
     {
         Tilemap[] maps = FindObjectsOfType<Tilemap>();
 
-        foreach (var map in maps)
-        {
-            _tilemaps.Add(map.name, map);
-        }
+        foreach (var map in maps) _tilemaps.Add(map.name, map);
     }
 
     public void OnSave()
     {
         List<TilemapData> data = new List<TilemapData>();
 
-        foreach (var mapObj in _tilemaps)
+        foreach (KeyValuePair<string, Tilemap> mapObj in _tilemaps)
         {
-            TilemapData mapData = new TilemapData();
+            var mapData = new TilemapData();
             mapData.Key = mapObj.Key;
 
-            BoundsInt boundsForThisMap = mapObj.Value.cellBounds;
+            var boundsForThisMap = mapObj.Value.cellBounds;
 
-            for (int x = boundsForThisMap.xMin; x < boundsForThisMap.xMax; x++)
+            for (var x = boundsForThisMap.xMin; x < boundsForThisMap.xMax; x++)
+            for (var y = boundsForThisMap.yMin; y < boundsForThisMap.yMax; y++)
             {
-                for (int y = boundsForThisMap.yMin; y < boundsForThisMap.yMax; y++)
-                {
-                    Vector3Int pos = new Vector3Int(x, y, 0);
-                    TileBase tile = mapObj.Value.GetTile(pos);
+                var pos = new Vector3Int(x, y, 0);
+                var tile = mapObj.Value.GetTile(pos);
 
-                    if (tile != null)
+                if (tile != null)
+                {
+                    if (AssetDatabase.TryGetGUIDAndLocalFileIdentifier(tile, out var guid, out var localId))
                     {
-                        if (AssetDatabase.TryGetGUIDAndLocalFileIdentifier(tile, out string guid, out long localId))
-                        {
-                            TileInfo ti = new TileInfo(tile, pos, guid);
-                            mapData.Tiles.Add(ti);
-                        }
-                        else
-                        {
-                            Debug.LogError("Could not get GUID for tile " + tile.name);
-                        }
+                        var ti = new TileInfo(tile, pos, guid);
+                        mapData.Tiles.Add(ti);
+                    }
+                    else
+                    {
+                        Debug.LogError("Could not get GUID for tile " + tile.name);
                     }
                 }
             }
@@ -61,7 +60,7 @@ public class SaveHandler : Singleton<SaveHandler>
             data.Add(mapData);
         }
 
-        FileHandler.SaveToJSON<TilemapData>(data, fileName);
+        FileHandler.SaveToJSON(data, fileName);
     }
 
     public void OnLoad()
@@ -81,14 +80,13 @@ public class SaveHandler : Singleton<SaveHandler>
 
             map.ClearAllTiles();
             if (mapData.Tiles != null && mapData.Tiles.Count > 0)
-            {
-                foreach (TileInfo tile in mapData.Tiles)
+                foreach (var tile in mapData.Tiles)
                 {
-                    TileBase tileBase = tile.Tile;
+                    var tileBase = tile.Tile;
                     if (tileBase == null)
                     {
                         Debug.Log("[Loading Tilemap]: InstanceID not found - looking in AssetDatabase");
-                        string path = AssetDatabase.GUIDToAssetPath(tile.GuidFromAssetDB);
+                        var path = AssetDatabase.GUIDToAssetPath(tile.GuidFromAssetDB);
                         tileBase = AssetDatabase.LoadAssetAtPath<TileBase>(path);
 
                         if (tileBase == null)
@@ -100,7 +98,6 @@ public class SaveHandler : Singleton<SaveHandler>
 
                     map.SetTile(tile.Position, tileBase);
                 }
-            }
         }
     }
 }
@@ -121,7 +118,7 @@ public class TileInfo
 
     public TileInfo(TileBase tile, Vector3Int pos, string guid)
     {
-        this.Tile = tile;
+        Tile = tile;
         Position = pos;
         GuidFromAssetDB = guid;
     }

@@ -1,19 +1,20 @@
+#region
+
 using UnityEngine;
 using UnityEngine.UI;
+
+#endregion
 
 public class BuildingBoutonHandler : MonoBehaviour
 {
     [SerializeField] BuildingObjectBase item;
     Button _button;
-
     BuildingCreator _creator;
+    public SetBuildingPanel Panel;
 
     public BuildingObjectBase Item
     {
-        set
-        {
-            item = value;
-        }
+        set => item = value;
     }
 
     void Awake()
@@ -25,7 +26,8 @@ public class BuildingBoutonHandler : MonoBehaviour
 
     void ButtonClicked()
     {
-        Debug.Log("Button was Clicked : " + item.name);
+        Debug.Log("Button was Clicked : " + item.name); 
         _creator.ObjectSelected(item);
+        Panel.ClosePanel.Invoke();
     }
 }

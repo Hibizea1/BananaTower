@@ -1,10 +1,12 @@
-using System;
+#region
+
 using System.Collections.Generic;
 using TMPro;
-using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.UI;
+
+#endregion
 
 public class BuildingHUD : Singleton<BuildingHUD>
 {
@@ -12,19 +14,20 @@ public class BuildingHUD : Singleton<BuildingHUD>
     [SerializeField] Transform wrapperElement;
     [SerializeField] GameObject categoryPrefab;
     [SerializeField] GameObject itemPrefab;
+    [SerializeField] GameObject buildingButtonPanel;
+    readonly Dictionary<GameObject, Transform> _elementItemSlot = new Dictionary<GameObject, Transform>();
 
 
-    Dictionary<UiCategory, GameObject> _uiElement = new Dictionary<UiCategory, GameObject>();
-    Dictionary<GameObject, Transform> _elementItemSlot = new Dictionary<GameObject, Transform>();
+    readonly Dictionary<UiCategory, GameObject> _uiElement = new Dictionary<UiCategory, GameObject>();
 
     void Start()
     {
         BuildUI();
     }
 
-    private void BuildUI()
+    void BuildUI()
     {
-        foreach (UiCategory cat in categories)
+        foreach (var cat in categories)
         {
             if (!_uiElement.ContainsKey(cat))
             {
@@ -32,41 +35,39 @@ public class BuildingHUD : Singleton<BuildingHUD>
                 inst.transform.SetParent(wrapperElement, false);
 
                 _uiElement[cat] = inst;
-                _elementItemSlot[inst] = inst.transform.Find("Items");
+                _elementItemSlot[inst] = inst.GetComponent<GetContentPanel>().Content;
             }
 
             _uiElement[cat].name = cat.name;
 
-            TextMeshProUGUI text = _uiElement[cat].GetComponentInChildren<TextMeshProUGUI>();
+            var text = _uiElement[cat].GetComponentInChildren<TextMeshProUGUI>();
             text.text = cat.name;
 
-            Image img = _uiElement[cat].GetComponentInChildren<Image>();
+            var img = _uiElement[cat].GetComponentInChildren<Image>();
             img.color = cat.BackgroundColor;
         }
 
         BuildingObjectBase[] buildables = GetAllBuildables();
 
-        foreach (BuildingObjectBase b in buildables)
+        foreach (var b in buildables)
         {
-            if (b.UiCategory == null)
-            {
-                continue;
-            }
+            if (b.UiCategory == null) continue;
             var itemsParent = _elementItemSlot[_uiElement[b.UiCategory]];
 
             var inst = Instantiate(itemPrefab, Vector3.zero, Quaternion.identity);
             inst.transform.SetParent(itemsParent, false);
 
-            Image img = inst.GetComponent<Image>();
-            Tile t = (Tile)b.Tile;
+            var img = inst.GetComponent<Image>();
+            var t = (Tile)b.Tile;
             img.sprite = t.sprite;
 
             var script = inst.GetComponent<BuildingBoutonHandler>();
             script.Item = b;
+            script.Panel = buildingButtonPanel.GetComponent<SetBuildingPanel>();
         }
     }
 
-    private BuildingObjectBase[] GetAllBuildables()
+    BuildingObjectBase[] GetAllBuildables()
     {
         return Resources.LoadAll<BuildingObjectBase>("Scriptable/Buildables");
     }

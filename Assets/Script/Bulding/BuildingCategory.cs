@@ -1,48 +1,31 @@
+#region
+
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public enum PlaceType {
+#endregion
+
+public enum PlaceType
+{
     None,
     Single,
     Line,
-    Rectangle,
+    Rectangle
 }
 
 [CreateAssetMenu(fileName = "Category", menuName = "LevelBuilding/Create Category")]
-public class BuildingCategory : ScriptableObject {
+public class BuildingCategory : ScriptableObject
+{
     [SerializeField] PlaceType placeType;
-    [SerializeField] int sortingOrder = 0;
+    [SerializeField] int sortingOrder;
     [SerializeField] List<BuildingCategory> placementRestriction = new List<BuildingCategory>();
-    Tilemap _tilemap;
 
-    public List<BuildingCategory> PlacementRestriction
-    {
-        get
-        {
-            return placementRestriction;
-        }
-    }
-    
-    public PlaceType PlaceType {
-        get {
-            return placeType;
-        }
-    }
+    public List<BuildingCategory> PlacementRestriction => placementRestriction;
 
-    public Tilemap Tilemap {
-        get {
-            return _tilemap;
-        }
+    public PlaceType PlaceType => placeType;
 
-        set {
-            _tilemap = value;
-        }
-    }
+    public Tilemap Tilemap { get; set; }
 
-    public int SortingOrder {
-        get {
-            return sortingOrder;
-        }
-    }
+    public int SortingOrder => sortingOrder;
 }

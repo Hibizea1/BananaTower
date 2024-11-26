@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e437e956bab6e2d42a7e78310408f016, type: 3}
   m_Name: Turret
   m_EditorClassIdentifier: 
-  placeType: 0
-  sortingOrder: 0
+  placeType: 1
+  sortingOrder: 5
   placementRestriction: []
