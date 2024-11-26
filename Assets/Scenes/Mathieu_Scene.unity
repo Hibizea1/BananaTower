@@ -336,7 +336,6 @@ GameObject:
   - component: {fileID: 428027598}
   - component: {fileID: 428027597}
   - component: {fileID: 428027601}
-  - component: {fileID: 428027600}
   - component: {fileID: 428027599}
   m_Layer: 0
   m_Name: MapManager
@@ -408,22 +407,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95c92b9f4a7e27947bbd52f642ba9ab6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &428027600
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 428027595}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6aab2d519508e32458007cf6ad8d0c07, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bounds:
-    m_Position: {x: 0, y: 0, z: 0}
-    m_Size: {x: 0, y: 0, z: 0}
-  fileName: TilemapData.JSON
 --- !u!114 &428027601
 MonoBehaviour:
   m_ObjectHideFlags: 0
