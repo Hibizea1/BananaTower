@@ -8,7 +8,5 @@ public class TestTurret : Turret
         Damage += 1;
     }
 
-    protected override void Shoot()
-    {
-    }
+   
 }
