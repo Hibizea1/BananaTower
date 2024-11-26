@@ -10,6 +10,8 @@ public abstract class Turret : MonoBehaviour
     [SerializeField] private int _magazineSize;
     [SerializeField] private float _reloadTime;
 
+    #region PropertySettings
+
     public int Damage
     {
         get => _damage;
@@ -40,6 +42,9 @@ public abstract class Turret : MonoBehaviour
         protected set => _reloadTime = value;
     }
 
+    #endregion
+
+
     private int _currentMagazine;
 
     private float _reloadTimer;
@@ -47,18 +52,18 @@ public abstract class Turret : MonoBehaviour
 
     private CircleCollider2D _detectionCollider;
 
-    private List<GameObject> _enemiesInRange; //set to enemy class for optimisation
+    private List<MonkeyBase> _enemiesInRange;
 
     private void Start()
     {
-        _enemiesInRange = new List<GameObject>();
+        _enemiesInRange = new List<MonkeyBase>();
         _detectionCollider = GetComponent<CircleCollider2D>();
 
-        _currentMagazine = MagazineSize;
+        _currentMagazine = _magazineSize;
         _reloadTimer = 0;
         _shootTimer = 0;
 
-        _detectionCollider.radius = Range;
+        _detectionCollider.radius = _range;
     }
 
     private void Update()
@@ -68,7 +73,13 @@ public abstract class Turret : MonoBehaviour
         CheckOnShoot();
     }
 
-    protected abstract void Shoot();
+    protected virtual void Shoot()
+    {
+        _enemiesInRange[0].TakeDamage(_damage);
+        //TODO : Instantiate projectile maybe deal damage with projectile
+        Debug.Log("Bang");
+    }
+
     public abstract void Upgrade();
 
     protected virtual void Reload()
@@ -101,17 +112,13 @@ public abstract class Turret : MonoBehaviour
 
     private void OnCollisionEnter(Collision other)
     {
-        //if (other.gameObject.TryGetComponent()) Component for enemy
-        {
-            _enemiesInRange.Add(other.gameObject); //add the component
-        }
+        if (other.gameObject.TryGetComponent(out MonkeyBase c))
+            _enemiesInRange.Add(c);
     }
 
     private void OnCollisionExit(Collision other)
     {
-        //if (other.gameObject.TryGetComponent()) Component for enemy
-        {
-            _enemiesInRange.Remove(other.gameObject); //add the component
-        }
+        if (other.gameObject.TryGetComponent(out MonkeyBase c))
+            _enemiesInRange.Remove(c);
     }
 }
