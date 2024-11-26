@@ -1,7 +1,9 @@
 #region
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -29,7 +31,16 @@ public class BuildingCreator : Singleton<BuildingCreator>
     Vector2 _mousePos;
 
     TileBase _tileBase;
+    [SerializeField] Renderer gridRenderer;
+    [SerializeField] float cellSize;
+    static readonly int CellSize = Shader.PropertyToID("_CellSize");
 
+#if UNITY_EDITOR
+    void OnValidate()
+    {
+        UpdateGridVisual();
+    }
+#endif
     public BuildingObjectBase SelectedObj
     {
         set
@@ -59,6 +70,12 @@ public class BuildingCreator : Singleton<BuildingCreator>
         _input = new PlayerInput();
         _camera = Camera.main;
 
+    }
+
+    void Start()
+    {
+        UpdateGridVisual();
+        EnableGridVisual(false);
     }
 
     void Update()
@@ -136,11 +153,13 @@ public class BuildingCreator : Singleton<BuildingCreator>
     void OnRightClick(InputAction.CallbackContext obj)
     {
         SelectedObj = null;
+        EnableGridVisual(false);
     }
 
     public void ObjectSelected(BuildingObjectBase obj)
     {
         SelectedObj = obj;
+        EnableGridVisual(true);
     }
 
     void UpdatePreview()
@@ -253,7 +272,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
 
     void DrawItem(Tilemap map, Vector3Int position, TileBase tileBase)
     {
-
+        
         if (map != previewMap && _selectedObj.GetType() == typeof(BuildingTool))
         {
             var tool = (BuildingTool)_selectedObj;
@@ -263,8 +282,24 @@ public class BuildingCreator : Singleton<BuildingCreator>
         {
             Tile tile = (Tile)_tileBase;
             tile.color = Color.clear;
+            SpriteRenderer itemSprite = tile.gameObject.GetComponent<SpriteRenderer>();
+            itemSprite.sortingOrder = _selectedObj.Category.SortingOrder;
             TileBase newTileBase = tile;
             map.SetTile(position, newTileBase);
         }
+    }
+
+
+    private void EnableGridVisual(bool on)
+    {
+        if (gridRenderer == null) return;
+        gridRenderer.gameObject.SetActive(on);
+    }
+
+    private void UpdateGridVisual()
+    {
+        if (gridRenderer == null) return;
+        gridRenderer.sharedMaterial.SetVector(
+            CellSize, new Vector4(cellSize, cellSize, 0, 0));
     }
 }
