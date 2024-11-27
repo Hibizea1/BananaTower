@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -11,20 +12,26 @@ using UnityEngine.Tilemaps;
 public class SaveHandler : Singleton<SaveHandler>
 {
     [SerializeField] BoundsInt bounds;
-    [SerializeField] string fileName = "TilemapData.JSON";
+    [SerializeField] string fileName = "tilemapdata.JSON";
     readonly Dictionary<string, Tilemap> _tilemaps = new Dictionary<string, Tilemap>();
 
     void Start()
     {
-        initTilemap();
+        InitTilemap();
     }
 
-    void initTilemap()
+    void InitTilemap()
     {
         Tilemap[] maps = FindObjectsOfType<Tilemap>();
 
         foreach (var map in maps) _tilemaps.Add(map.name, map);
     }
+
+    // void InitTurret()
+    // {
+    //     List<Turret> turrets = FindObjectsByType(FindObjectsInactive.Include, FindObjectsSortMode.InstanceID );
+    //     
+    // }
 
     public void OnSave()
     {
@@ -33,34 +40,42 @@ public class SaveHandler : Singleton<SaveHandler>
         foreach (KeyValuePair<string, Tilemap> mapObj in _tilemaps)
         {
             var mapData = new TilemapData();
-            mapData.Key = mapObj.Key;
-
-            var boundsForThisMap = mapObj.Value.cellBounds;
-
-            for (var x = boundsForThisMap.xMin; x < boundsForThisMap.xMax; x++)
-            for (var y = boundsForThisMap.yMin; y < boundsForThisMap.yMax; y++)
-            {
-                var pos = new Vector3Int(x, y, 0);
-                var tile = mapObj.Value.GetTile(pos);
-
-                if (tile != null)
-                {
-                    if (AssetDatabase.TryGetGUIDAndLocalFileIdentifier(tile, out var guid, out var localId))
-                    {
-                        var ti = new TileInfo(tile, pos, guid);
-                        mapData.Tiles.Add(ti);
-                    }
-                    else
-                    {
-                        Debug.LogError("Could not get GUID for tile " + tile.name);
-                    }
-                }
-            }
+            mapData = TilemapSave(mapObj);
 
             data.Add(mapData);
         }
 
         FileHandler.SaveToJSON(data, fileName);
+    }
+
+    TilemapData TilemapSave(KeyValuePair<string, Tilemap> mapObj)
+    {
+        var mapData = new TilemapData();
+        mapData.Key = mapObj.Key;
+
+        var boundsForThisMap = mapObj.Value.cellBounds;
+
+        for (var x = boundsForThisMap.xMin; x < boundsForThisMap.xMax; x++)
+        for (var y = boundsForThisMap.yMin; y < boundsForThisMap.yMax; y++)
+        {
+            var pos = new Vector3Int(x, y, 0);
+            var tile = mapObj.Value.GetTile(pos);
+
+            if (tile != null)
+            {
+                if (AssetDatabase.TryGetGUIDAndLocalFileIdentifier(tile, out var guid, out var localId))
+                {
+                    var ti = new TileInfo(tile, pos, guid);
+                    mapData.Tiles.Add(ti);
+                }
+                else
+                {
+                    Debug.LogError("Could not get GUID for tile " + tile.name);
+                }
+            }
+        }
+
+        return mapData;
     }
 
     public void OnLoad()
@@ -122,4 +137,10 @@ public class TileInfo
         Position = pos;
         GuidFromAssetDB = guid;
     }
+}
+
+[Serializable]
+public class Turret
+{
+    public Vector3Int Position;
 }
