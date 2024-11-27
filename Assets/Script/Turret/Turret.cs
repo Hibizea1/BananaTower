@@ -68,6 +68,16 @@ public abstract class Turret : MonoBehaviour
         CheckOnShoot();
     }
 
+    public void LoadData(int damage, int range, float shootRate, int magazineSize, float reloadTime, string loadName)
+    {
+        Damage = damage;
+        Range = range;
+        ShootRate = shootRate;
+        MagazineSize = magazineSize;
+        ReloadTime = reloadTime;
+        name = loadName;
+    }
+
     protected abstract void Shoot();
     public abstract void Upgrade();
 

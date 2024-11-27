@@ -2,145 +2,234 @@
 
 using System;
 using System.Collections.Generic;
-using NUnit.Framework;
+using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.Tilemaps;
 
 #endregion
 
-public class SaveHandler : Singleton<SaveHandler>
+namespace Script.Controller.Save
 {
-    [SerializeField] BoundsInt bounds;
-    [SerializeField] string fileName = "tilemapdata.JSON";
-    readonly Dictionary<string, Tilemap> _tilemaps = new Dictionary<string, Tilemap>();
-
-    void Start()
+    public class SaveHandler : Singleton<SaveHandler>
     {
-        InitTilemap();
-    }
+        [SerializeField] BoundsInt bounds;
+        [SerializeField] string fileName = "SaveBananaDefense.JSON";
+        readonly Dictionary<string, Tilemap> _tilemaps = new Dictionary<string, Tilemap>();
 
-    void InitTilemap()
-    {
-        Tilemap[] maps = FindObjectsOfType<Tilemap>();
-
-        foreach (var map in maps) _tilemaps.Add(map.name, map);
-    }
-
-    // void InitTurret()
-    // {
-    //     List<Turret> turrets = FindObjectsByType(FindObjectsInactive.Include, FindObjectsSortMode.InstanceID );
-    //     
-    // }
-
-    public void OnSave()
-    {
-        List<TilemapData> data = new List<TilemapData>();
-
-        foreach (KeyValuePair<string, Tilemap> mapObj in _tilemaps)
+        void Start()
         {
-            var mapData = new TilemapData();
-            mapData = TilemapSave(mapObj);
-
-            data.Add(mapData);
+            InitTilemap();
         }
 
-        FileHandler.SaveToJSON(data, fileName);
-    }
-
-    TilemapData TilemapSave(KeyValuePair<string, Tilemap> mapObj)
-    {
-        var mapData = new TilemapData();
-        mapData.Key = mapObj.Key;
-
-        var boundsForThisMap = mapObj.Value.cellBounds;
-
-        for (var x = boundsForThisMap.xMin; x < boundsForThisMap.xMax; x++)
-        for (var y = boundsForThisMap.yMin; y < boundsForThisMap.yMax; y++)
+        void InitTilemap()
         {
-            var pos = new Vector3Int(x, y, 0);
-            var tile = mapObj.Value.GetTile(pos);
+            Tilemap[] maps = FindObjectsByType<Tilemap>(FindObjectsInactive.Include, FindObjectsSortMode.InstanceID);
 
-            if (tile != null)
+            foreach (var map in maps) _tilemaps.Add(map.name, map);
+        }
+
+        public void OnSave()
+        {
+            GameSave gameSave = new GameSave(
+                SaveTurrets(),
+                SaveTilemaps()
+            );
+            FileHandler.SaveToJSON(gameSave, fileName);
+        }
+
+        #region SaveData
+
+        List<TurretSave> SaveTurrets()
+        {
+            List<TurretSave> turretSaves = new List<TurretSave>();
+            Turret[] turrets = FindObjectsByType<Turret>(FindObjectsInactive.Include, FindObjectsSortMode.InstanceID);
+
+            foreach (var turret in turrets)
             {
-                if (AssetDatabase.TryGetGUIDAndLocalFileIdentifier(tile, out var guid, out var localId))
+                Debug.Log(turret.transform.position);
+                var turretSave = new TurretSave(
+                    turret.transform.position,
+                    turret.Damage,
+                    turret.Range,
+                    turret.ShootRate,
+                    turret.MagazineSize,
+                    turret.ReloadTime,
+                    turret.name
+                );
+                turretSaves.Add(turretSave);
+            }
+
+            return turretSaves;
+        }
+
+        List<TilemapData> SaveTilemaps()
+        {
+            List<TilemapData> data = new List<TilemapData>();
+
+            foreach (KeyValuePair<string, Tilemap> mapObj in _tilemaps)
+            {
+                var mapData = new TilemapData { Key = mapObj.Key };
+
+                var boundsForThisMap = mapObj.Value.cellBounds;
+
+                for (var x = boundsForThisMap.xMin; x < boundsForThisMap.xMax; x++)
+                for (var y = boundsForThisMap.yMin; y < boundsForThisMap.yMax; y++)
                 {
-                    var ti = new TileInfo(tile, pos, guid);
-                    mapData.Tiles.Add(ti);
+                    var pos = new Vector3Int(x, y, 0);
+                    var tile = mapObj.Value.GetTile(pos);
+
+                    if (tile != null)
+                    {
+                        var tileAddress = ((Tile)tile).name;
+                        var tileInfo = new TileInfo(tile, pos, tileAddress);
+                        mapData.Tiles.Add(tileInfo);
+                    }
+                }
+
+                data.Add(mapData);
+            }
+
+            return data;
+        }
+
+        #endregion
+
+        public void OnLoad()
+        {
+            GameSave gameSave = FileHandler.ReadFromJSON<GameSave>(fileName);
+            LoadTileMap(gameSave);
+        }
+
+        private async Task LoadTileMap(GameSave gameSave)
+        {
+            foreach (var mapData in gameSave.Tilemaps)
+            {
+                if (!_tilemaps.ContainsKey(mapData.Key))
+                {
+                    Debug.LogError("Found saved data for tilemap called '" + mapData.Key +
+                                   "', but tilemaps does not exist. Skip");
+                    continue;
+                }
+
+                var map = _tilemaps[mapData.Key];
+
+                map.ClearAllTiles();
+                if (mapData.Tiles != null && mapData.Tiles.Count > 0)
+                {
+                    foreach (var tile in mapData.Tiles)
+                    {
+                        TileBase tileBase = await Addressables.LoadAssetAsync<TileBase>(tile.GuidFromAssetDB).Task;
+                        OnTileLoaded(tileBase, map, tile);
+                    }
+                }
+            }
+            LoadTurrets(gameSave);
+        }
+
+        static void OnTileLoaded(TileBase tileBase, Tilemap map, TileInfo tile)
+        {
+            map.SetTile(tile.Position, tileBase);
+        }
+
+        private void LoadTurrets(GameSave gameSave)
+        {
+            foreach (var turretSave in gameSave.Turrets)
+            {
+                // Find the parent tilemap based on the turret's cell position
+                Tilemap parentTilemap = null;
+                foreach (var tilemap in _tilemaps.Values)
+                {
+                    if (tilemap.HasTile(tilemap.WorldToCell(turretSave.Position)))
+                    {
+                        parentTilemap = tilemap;
+                        break;
+                    }
+                }
+
+                if (parentTilemap != null)
+                {
+                    // Find the existing turret at the position
+                    Turret[] turrets = parentTilemap.GetComponentsInChildren<Turret>();
+                    Turret turret = Array.Find(turrets, t => Vector3.Distance(t.transform.position, turretSave.Position) < 0.1f);
+
+                    if (turret != null)
+                    {
+                        // Set the turret's properties
+                        turret.LoadData(turretSave.Damage, turretSave.Range, turretSave.ShootRate, turretSave.MagazineSize, turretSave.ReloadTime, turretSave.Name);
+                    }
+                    else
+                    {
+                        Debug.LogError("No turret found at position " + turretSave.Position);
+                    }
                 }
                 else
                 {
-                    Debug.LogError("Could not get GUID for tile " + tile.name);
+                    Debug.LogError("No parent tilemap found for turret at position " + turretSave.Position);
                 }
             }
         }
 
-        return mapData;
-    }
 
-    public void OnLoad()
-    {
-        List<TilemapData> data = FileHandler.ReadListFromJSON<TilemapData>(fileName);
-
-        foreach (var mapData in data)
+        [Serializable]
+        public class TilemapData
         {
-            if (!_tilemaps.ContainsKey(mapData.Key))
+            public string Key;
+            public List<TileInfo> Tiles = new List<TileInfo>();
+        }
+
+        [Serializable]
+        public class TileInfo
+        {
+            public TileBase Tile;
+            public string GuidFromAssetDB;
+            public Vector3Int Position;
+
+            public TileInfo(TileBase tile, Vector3Int pos, string guid)
             {
-                Debug.LogError("Found saved data for tilemap called '" + mapData.Key +
-                               "', but tilemaps does not exist. Skip");
-                continue;
+                Tile = tile;
+                Position = pos;
+                GuidFromAssetDB = guid;
             }
+        }
 
-            var map = _tilemaps[mapData.Key];
+        [Serializable]
+        public class TurretSave
+        {
+            public Vector3 Position;
+            public string Name;
+            public int Damage;
+            public int Range;
+            public float ShootRate;
+            public int MagazineSize;
+            public float ReloadTime;
 
-            map.ClearAllTiles();
-            if (mapData.Tiles != null && mapData.Tiles.Count > 0)
-                foreach (var tile in mapData.Tiles)
-                {
-                    var tileBase = tile.Tile;
-                    if (tileBase == null)
-                    {
-                        Debug.Log("[Loading Tilemap]: InstanceID not found - looking in AssetDatabase");
-                        var path = AssetDatabase.GUIDToAssetPath(tile.GuidFromAssetDB);
-                        tileBase = AssetDatabase.LoadAssetAtPath<TileBase>(path);
+            public TurretSave(Vector3 position, int damage, int range, float shootRate, int magazineSize,
+                float reloadTime, string name)
+            {
+                Position = position;
+                Damage = damage;
+                Range = range;
+                ShootRate = shootRate;
+                MagazineSize = magazineSize;
+                ReloadTime = reloadTime;
+                Name = name;
+            }
+        }
 
-                        if (tileBase == null)
-                        {
-                            Debug.LogError("[Loading Tilemap]: Tile not found in AssetDatabase");
-                            continue;
-                        }
-                    }
+        [Serializable]
+        public class GameSave
+        {
+            public List<TurretSave> Turrets;
+            public List<TilemapData> Tilemaps;
 
-                    map.SetTile(tile.Position, tileBase);
-                }
+            public GameSave(List<TurretSave> turrets, List<TilemapData> tilemaps)
+            {
+                Turrets = turrets;
+                Tilemaps = tilemaps;
+            }
         }
     }
-}
-
-[Serializable]
-public class TilemapData
-{
-    public string Key;
-    public List<TileInfo> Tiles = new List<TileInfo>();
-}
-
-[Serializable]
-public class TileInfo
-{
-    public TileBase Tile;
-    public string GuidFromAssetDB;
-    public Vector3Int Position;
-
-    public TileInfo(TileBase tile, Vector3Int pos, string guid)
-    {
-        Tile = tile;
-        Position = pos;
-        GuidFromAssetDB = guid;
-    }
-}
-
-[Serializable]
-public class Turret
-{
-    public Vector3Int Position;
 }

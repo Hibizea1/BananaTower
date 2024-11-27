@@ -96,10 +96,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 541353024247506737}
-  - component: {fileID: 7307094332295527918}
   - component: {fileID: 7482845480327715177}
   - component: {fileID: 4435459189269209230}
   - component: {fileID: 6193550910538874656}
+  - component: {fileID: -4245097564284312162}
+  - component: {fileID: 1486213398664146144}
   m_Layer: 5
   m_Name: Turret
   m_TagString: Untagged
@@ -123,25 +124,6 @@ Transform:
   - {fileID: 8200252677771121065}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7307094332295527918
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6081184179311870438}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cc40085bce469f043b214f0ed762ab85, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  layerMask:
-    serializedVersion: 2
-    m_Bits: 64
-  range: 10
-  Segments: 50
-  CircleColor: {r: 1, g: 0, b: 0, a: 1}
-  DrawMaterial: {fileID: 2100000, guid: fc9067131af547a43b2dfe8396a45a37, type: 2}
 --- !u!114 &7482845480327715177
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -255,3 +237,56 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!58 &-4245097564284312162
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6081184179311870438}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_Radius: 0.25
+--- !u!114 &1486213398664146144
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6081184179311870438}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab052de8e2225da46b490c147fa4bcc2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _damage: 10
+  _range: 5
+  _shootRate: 20
+  _magazineSize: 50
+  _reloadTime: 2

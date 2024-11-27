@@ -29,6 +29,8 @@ public class BuildingCreator : Singleton<BuildingCreator>
     Vector3Int _lastGridPosition;
 
     Vector2 _mousePos;
+    int _index = 0;
+
 
     TileBase _tileBase;
     [SerializeField] Renderer gridRenderer;
@@ -272,7 +274,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
 
     void DrawItem(Tilemap map, Vector3Int position, TileBase tileBase)
     {
-        
+
         if (map != previewMap && _selectedObj.GetType() == typeof(BuildingTool))
         {
             var tool = (BuildingTool)_selectedObj;
@@ -284,6 +286,8 @@ public class BuildingCreator : Singleton<BuildingCreator>
             tile.color = Color.clear;
             SpriteRenderer itemSprite = tile.gameObject.GetComponent<SpriteRenderer>();
             itemSprite.sortingOrder = _selectedObj.Category.SortingOrder;
+            tile.gameObject.name = "Turret " + _index;
+            _index++;
             TileBase newTileBase = tile;
             map.SetTile(position, newTileBase);
         }
