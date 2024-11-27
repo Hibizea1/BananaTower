@@ -1,7 +1,10 @@
-using System;
+#region
+
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+
+#endregion
 
 public class TilemapInitializer : Singleton<TilemapInitializer>
 {
@@ -15,13 +18,13 @@ public class TilemapInitializer : Singleton<TilemapInitializer>
 
     void CreateMap()
     {
-        foreach (BuildingCategory category in categoriesToCreateTilemapFor)
+        foreach (var category in categoriesToCreateTilemapFor)
         {
-            GameObject obj = new GameObject("Tilemap_" + category.name);
+            var obj = new GameObject("Tilemap_" + category.name);
 
 
-            Tilemap map = obj.AddComponent<Tilemap>();
-            TilemapRenderer tr = obj.AddComponent<TilemapRenderer>();
+            var map = obj.AddComponent<Tilemap>();
+            var tr = obj.AddComponent<TilemapRenderer>();
 
             obj.transform.SetParent(grid);
 

@@ -1,12 +1,15 @@
-using System;
+#region
+
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+#endregion
+
 public class ToolController : Singleton<ToolController>
 {
-    List<Tilemap> _tilemaps = new List<Tilemap>();
+    readonly List<Tilemap> _tilemaps = new List<Tilemap>();
 
     void Start()
     {
@@ -14,16 +17,13 @@ public class ToolController : Singleton<ToolController>
             .ToList();
         maps.ForEach(map =>
         {
-            if (map.name.Contains("Tilemap_"))
-            {
-                _tilemaps.Add(map);
-            }
+            if (map.name.Contains("Tilemap_")) _tilemaps.Add(map);
         });
 
         _tilemaps.Sort((a, b) =>
         {
-            TilemapRenderer aRenderer = a.GetComponent<TilemapRenderer>();
-            TilemapRenderer bRenderer = b.GetComponent<TilemapRenderer>();
+            var aRenderer = a.GetComponent<TilemapRenderer>();
+            var bRenderer = b.GetComponent<TilemapRenderer>();
 
             return bRenderer.sortingOrder.CompareTo(aRenderer.sortingOrder);
         });
