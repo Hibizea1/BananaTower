@@ -1,9 +1,7 @@
 #region
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -14,35 +12,34 @@ using UnityEngine.Tilemaps;
 
 public class BuildingCreator : Singleton<BuildingCreator>
 {
-    [SerializeField] Tilemap previewMap, defaultMap;
+    static readonly int CellSize = Shader.PropertyToID("_CellSize");
+    [SerializeField] Tilemap previewMap, defaultMap, debugMap;
 
     [SerializeField] List<Tilemap> forbidPlacingWithMaps;
-    BuildingObjectBase _selectedObj;
+    [SerializeField] Renderer gridRenderer;
+    [SerializeField] float cellSize;
+    readonly Dictionary<Vector3Int, Node> _allNodes = new Dictionary<Vector3Int, Node>();
     BoundsInt _bounds;
 
     Camera _camera;
+    Node _current;
     Vector3Int _currentGridPosition;
 
     bool _holdActive;
     Vector3Int _holdStartPosition;
+    int _index;
     PlayerInput _input;
     Vector3Int _lastGridPosition;
 
     Vector2 _mousePos;
-    int _index = 0;
 
+    HashSet<Node> _openNodes, _closedNodes;
+    BuildingObjectBase _selectedObj;
+    Vector3Int _startPos, _goalPos;
 
     TileBase _tileBase;
-    [SerializeField] Renderer gridRenderer;
-    [SerializeField] float cellSize;
-    static readonly int CellSize = Shader.PropertyToID("_CellSize");
+    TileType _tileType;
 
-#if UNITY_EDITOR
-    void OnValidate()
-    {
-        UpdateGridVisual();
-    }
-#endif
     public BuildingObjectBase SelectedObj
     {
         set
@@ -107,8 +104,8 @@ public class BuildingCreator : Singleton<BuildingCreator>
         _input.Player.MouseLeftClick.started += OnLeftClick;
         _input.Player.MouseLeftClick.canceled += OnLeftClick;
         _input.Player.MouseRightClick.performed += OnRightClick;
+        _input.Player.LoadPathDebug.performed += Algorithm;
     }
-
 
     void OnDisable()
     {
@@ -118,6 +115,114 @@ public class BuildingCreator : Singleton<BuildingCreator>
         _input.Player.MouseRightClick.performed -= OnRightClick;
         _input.Player.MouseLeftClick.started -= OnLeftClick;
         _input.Player.MouseLeftClick.canceled -= OnLeftClick;
+        _input.Player.LoadPathDebug.performed -= Algorithm;
+    }
+
+#if UNITY_EDITOR
+    void OnValidate()
+    {
+        UpdateGridVisual();
+    }
+#endif
+
+    void Algorithm(InputAction.CallbackContext obj)
+    {
+        debugMap.ClearAllTiles();
+        if (_current == null) Initialize();
+
+        List<Node> neighbors = FindNeighbors(_current.Position);
+        ExamineNeighbors(neighbors, _current);
+
+        UpdateTiles(ref _current);
+
+        AStarDebug.Instance.CreateTiles(_openNodes, _closedNodes, _allNodes, _startPos, _goalPos);
+     }
+
+    List<Node> FindNeighbors(Vector3Int parentPosition)
+    {
+        List<Node> neighbors = new List<Node>();
+
+        for (var x = -1; x <= 1; x++)
+        for (var y = -1; y <= 1; y++)
+        {
+            var neighborPos = new Vector3Int(parentPosition.x - x, parentPosition.y - y, parentPosition.z);
+            if (y != 0 || x != 0)
+                if (neighborPos != _startPos && Tilemap.GetTile(neighborPos))
+                {
+                    var neighbor = GetNode(neighborPos);
+                    neighbors.Add(neighbor);
+                }
+        }
+
+        return neighbors;
+    }
+
+    void ExamineNeighbors(List<Node> neighbors, Node current)
+    {
+        for (var i = 0; i < neighbors.Count; i++)
+        {
+            _openNodes.Add(neighbors[i]);
+
+            int gScore = DetermineGScore(neighbors[i].Position, current.Position);
+            
+            CalculateValues(_current, neighbors[i], 0);
+        }
+    }
+
+    void CalculateValues(Node parent, Node neighbor, int cost)
+    {
+        neighbor.Parent = parent;
+
+        neighbor.G = parent.G + cost;
+
+        neighbor.H = (Mathf.Abs(neighbor.Position.x - _goalPos.x) + Mathf.Abs(neighbor.Position.y - _goalPos.y)) * 10;
+
+        neighbor.F = neighbor.G + neighbor.H;
+    }
+
+    private int DetermineGScore(Vector3Int neighbor, Vector3Int current)
+    {
+        int gScore = 0;
+
+        int x = current.x - neighbor.x;
+        int y = current.y - neighbor.y;
+
+        if (Mathf.Abs(x - y) % 2 == 1)
+        {
+            gScore = 10;
+        }
+        else
+        {
+            gScore = 14;
+        }
+
+        return gScore;
+    }
+
+    void UpdateTiles(ref Node current)
+    {
+        _openNodes.Remove(current);
+        _closedNodes.Add(current);
+    }
+
+    void Initialize()
+    {
+        _current = GetNode(_startPos);
+        _openNodes = new HashSet<Node>();
+        _closedNodes = new HashSet<Node>();
+        _openNodes.Add(_current);
+    }
+
+    Node GetNode(Vector3Int position)
+    {
+        if (_allNodes.ContainsKey(position))
+        {
+            return _allNodes[position];
+        }
+
+        var node = new Node(position);
+        _allNodes.Add(position, node);
+        return node;
     }
 
     void OnMouseMove(InputAction.CallbackContext ctx)
@@ -160,7 +265,20 @@ public class BuildingCreator : Singleton<BuildingCreator>
 
     public void ObjectSelected(BuildingObjectBase obj)
     {
-        SelectedObj = obj;
+        if (obj.IsWall)
+        {
+            SelectedObj = obj;
+            var selelected = (AStarTileRule)_selectedObj.Tile;
+            _tileType = selelected.Type;
+        }
+        else
+        {
+            SelectedObj = obj;
+            var selected = (AStarTile)_selectedObj.Tile;
+            _tileType = selected.Type;
+        }
+
+
         EnableGridVisual(true);
     }
 
@@ -174,10 +292,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
 
     bool IsForbidden(Vector3Int pos)
     {
-        if (_selectedObj == null)
-        {
-            return false;
-        }
+        if (_selectedObj == null) return false;
 
         List<BuildingCategory> restrictedCategories = _selectedObj.PlacementRestriction;
         List<Tilemap> restrictedMaps = restrictedCategories.ConvertAll(category => category.Tilemap);
@@ -282,25 +397,41 @@ public class BuildingCreator : Singleton<BuildingCreator>
         }
         else if (!IsForbidden(position))
         {
-            Tile tile = (Tile)_tileBase;
-            tile.color = Color.clear;
-            SpriteRenderer itemSprite = tile.gameObject.GetComponent<SpriteRenderer>();
-            itemSprite.sortingOrder = _selectedObj.Category.SortingOrder;
-            tile.gameObject.name = "Turret " + _index;
-            _index++;
-            TileBase newTileBase = tile;
-            map.SetTile(position, newTileBase);
+            if (_tileType != TileType.Water)
+            {
+                var tile = (AStarTile)_tileBase;
+                if (tile.gameObject != null)
+                {
+                    tile.color = Color.clear;
+                    var itemSprite = tile.gameObject.GetComponent<SpriteRenderer>();
+                    itemSprite.sortingOrder = _selectedObj.Category.SortingOrder;
+                    tile.gameObject.name = "Turret " + _index;
+                    _index++;
+                }
+
+                TileBase newTileBase = tile;
+                map.SetTile(position, newTileBase);
+                if (_tileType == TileType.Start)
+                    _startPos = position;
+                else if (_tileType == TileType.Goal) _goalPos = position;
+            }
+            else
+            {
+                var tile = (AStarTileRule)_tileBase;
+                TileBase newTileBase = tile;
+                map.SetTile(position, newTileBase);
+            }
         }
     }
 
 
-    private void EnableGridVisual(bool on)
+    void EnableGridVisual(bool on)
     {
         if (gridRenderer == null) return;
         gridRenderer.gameObject.SetActive(on);
     }
 
-    private void UpdateGridVisual()
+    void UpdateGridVisual()
     {
         if (gridRenderer == null) return;
         gridRenderer.sharedMaterial.SetVector(

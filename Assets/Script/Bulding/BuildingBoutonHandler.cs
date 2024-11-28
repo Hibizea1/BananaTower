@@ -8,12 +8,13 @@ using UnityEngine.UI;
 public class BuildingBoutonHandler : MonoBehaviour
 {
     [SerializeField] BuildingObjectBase item;
+    public SetBuildingPanel Panel;
     Button _button;
     BuildingCreator _creator;
-    public SetBuildingPanel Panel;
 
     public BuildingObjectBase Item
     {
+        get => item;
         set => item = value;
     }
 
@@ -26,7 +27,7 @@ public class BuildingBoutonHandler : MonoBehaviour
 
     void ButtonClicked()
     {
-        Debug.Log("Button was Clicked : " + item.name); 
+        Debug.Log("Button was Clicked : " + item.name);
         _creator.ObjectSelected(item);
         Panel.ClosePanel.Invoke();
     }

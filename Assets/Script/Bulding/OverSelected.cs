@@ -1,13 +1,15 @@
-using System;
+#region
+
 using UnityEngine;
-using UnityEngine.UI;
+
+#endregion
 
 public class OverSelected : MonoBehaviour
 {
-    GameObject _currentBuilding;
     Camera _camera;
+    GameObject _currentBuilding;
     SpriteRenderer _img;
-    
+
     void Start()
     {
         _camera = Camera.main;
@@ -27,7 +29,7 @@ public class OverSelected : MonoBehaviour
                 _currentBuilding = hitCollider.gameObject;
                 _img = _currentBuilding.transform.GetChild(0).GetComponent<SpriteRenderer>();
                 _img.enabled = true;
-                _img.transform.Rotate(0,0, 5 * Time.deltaTime);
+                _img.transform.Rotate(0, 0, 5 * Time.deltaTime);
             }
         }
         else

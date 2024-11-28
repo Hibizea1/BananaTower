@@ -1,11 +1,42 @@
+#region
+
 using UnityEngine;
+
+#endregion
 
 public abstract class MonkeyBase : MonoBehaviour
 {
-    [SerializeField] private int _damage;
-    [SerializeField] private int _health;
-    [SerializeField] private int _bananasOnDeath;
-    [SerializeField] private float _speed;
+    [SerializeField] int _damage;
+    [SerializeField] int _health;
+    [SerializeField] int _bananasOnDeath;
+    [SerializeField] float _speed;
+
+
+    void Update()
+    {
+        Move();
+    }
+
+    protected virtual void Move()
+    {
+        //TODO : movement Here
+    }
+
+    public virtual void TakeDamage(int damageTaken)
+    {
+        if (_health - damageTaken > 0)
+            _health -= damageTaken;
+        else
+            Die();
+    }
+
+    void Die()
+    {
+        //TODO : monkey death
+        Destroy(this);
+    }
+
+    public abstract void SpecialAbility();
 
     #region PropertySettings
 
@@ -34,31 +65,4 @@ public abstract class MonkeyBase : MonoBehaviour
     }
 
     #endregion
-
-
-    private void Update()
-    {
-        Move();
-    }
-
-    protected virtual void Move()
-    {
-        //TODO : movement Here
-    }
-
-    public virtual void TakeDamage(int damageTaken)
-    {
-        if (_health - damageTaken > 0)
-            _health -= damageTaken;
-        else
-            Die();
-    }
-
-    private void Die()
-    {
-        //TODO : monkey death
-        Destroy(this);
-    }
-
-    public abstract void SpecialAbility();
 }

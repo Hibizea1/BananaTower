@@ -23,6 +23,12 @@ public class BuildingObjectBase : ScriptableObject
     [SerializeField] PlaceType placeType;
     [SerializeField] bool usePlacementRestriction;
     [SerializeField] List<BuildingCategory> placementRestriction = new List<BuildingCategory>();
+    [SerializeField] bool isWall;
+    [SerializeField] bool isInvisible;
+
+    public bool IsInvisible => isInvisible;
+
+    public bool IsWall => isWall;
 
     public List<BuildingCategory> PlacementRestriction =>
         usePlacementRestriction ? placementRestriction : category.PlacementRestriction;

@@ -52,18 +52,55 @@ public class BuildingHUD : Singleton<BuildingHUD>
         foreach (var b in buildables)
         {
             if (b.UiCategory == null) continue;
-            var itemsParent = _elementItemSlot[_uiElement[b.UiCategory]];
+            if (b.IsInvisible) continue;
+            if (b.UiCategory == categories[1])
+            {
+                var itemsParent = _elementItemSlot[_uiElement[b.UiCategory]];
 
-            var inst = Instantiate(itemPrefab, Vector3.zero, Quaternion.identity);
-            inst.transform.SetParent(itemsParent, false);
+                var inst = Instantiate(itemPrefab, Vector3.zero, Quaternion.identity);
+                inst.transform.SetParent(itemsParent, false);
+                inst.AddComponent<TileButton>();
 
-            var img = inst.GetComponent<Image>();
-            var t = (Tile)b.Tile;
-            img.sprite = t.sprite;
+                if (b.IsWall)
+                {
+                    var t = (RuleTile)b.Tile;
+                    var img = inst.GetComponent<Image>();
+                    img.sprite = t.m_DefaultSprite;
+                    var script = inst.GetComponent<BuildingBoutonHandler>();
+                    script.Item = b;
+                    script.Panel = buildingButtonPanel.GetComponent<SetBuildingPanel>();
+                    var btn = inst.GetComponent<TileButton>();
+                    btn.TileType = ((AStarTileRule)script.Item.Tile).Type;
+                }
+                else
+                {
+                    var t = (Tile)b.Tile;
+                    var img = inst.GetComponent<Image>();
+                    img.sprite = t.sprite;
+                    var script = inst.GetComponent<BuildingBoutonHandler>();
+                    script.Item = b;
+                    script.Panel = buildingButtonPanel.GetComponent<SetBuildingPanel>();
+                    var btn = inst.GetComponent<TileButton>();
+                    btn.TileType = ((AStarTile)script.Item.Tile).Type;
+                }
 
-            var script = inst.GetComponent<BuildingBoutonHandler>();
-            script.Item = b;
-            script.Panel = buildingButtonPanel.GetComponent<SetBuildingPanel>();
+                print("Type is : " + inst.GetComponent<TileButton>().TileType);
+            }
+            else
+            {
+                var itemsParent = _elementItemSlot[_uiElement[b.UiCategory]];
+
+                var inst = Instantiate(itemPrefab, Vector3.zero, Quaternion.identity);
+                inst.transform.SetParent(itemsParent, false);
+
+                var img = inst.GetComponent<Image>();
+                var t = (Tile)b.Tile;
+                img.sprite = t.sprite;
+
+                var script = inst.GetComponent<BuildingBoutonHandler>();
+                script.Item = b;
+                script.Panel = buildingButtonPanel.GetComponent<SetBuildingPanel>();
+            }
         }
     }
 

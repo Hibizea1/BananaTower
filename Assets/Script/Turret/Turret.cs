@@ -1,14 +1,27 @@
+#region
+
 using System.Collections.Generic;
 using UnityEngine;
+
+#endregion
 
 [RequireComponent(typeof(CircleCollider2D))]
 public abstract class Turret : MonoBehaviour
 {
-    [SerializeField] private int _damage;
-    [SerializeField] private int _range;
-    [SerializeField] private float _shootRate;
-    [SerializeField] private int _magazineSize;
-    [SerializeField] private float _reloadTime;
+    [SerializeField] int _damage;
+    [SerializeField] int _range;
+    [SerializeField] float _shootRate;
+    [SerializeField] int _magazineSize;
+    [SerializeField] float _reloadTime;
+
+    int _currentMagazine;
+
+    CircleCollider2D _detectionCollider;
+
+    List<GameObject> _enemiesInRange; //set to enemy class for optimisation
+
+    float _reloadTimer;
+    float _shootTimer;
 
     public int Damage
     {
@@ -40,16 +53,7 @@ public abstract class Turret : MonoBehaviour
         protected set => _reloadTime = value;
     }
 
-    private int _currentMagazine;
-
-    private float _reloadTimer;
-    private float _shootTimer;
-
-    private CircleCollider2D _detectionCollider;
-
-    private List<GameObject> _enemiesInRange; //set to enemy class for optimisation
-
-    private void Start()
+    void Start()
     {
         _enemiesInRange = new List<GameObject>();
         _detectionCollider = GetComponent<CircleCollider2D>();
@@ -61,11 +65,27 @@ public abstract class Turret : MonoBehaviour
         _detectionCollider.radius = Range;
     }
 
-    private void Update()
+    void Update()
     {
         CheckOnReload();
 
         CheckOnShoot();
+    }
+
+    void OnCollisionEnter(Collision other)
+    {
+        //if (other.gameObject.TryGetComponent()) Component for enemy
+        {
+            _enemiesInRange.Add(other.gameObject); //add the component
+        }
+    }
+
+    void OnCollisionExit(Collision other)
+    {
+        //if (other.gameObject.TryGetComponent()) Component for enemy
+        {
+            _enemiesInRange.Remove(other.gameObject); //add the component
+        }
     }
 
     public void LoadData(int damage, int range, float shootRate, int magazineSize, float reloadTime, string loadName)
@@ -86,7 +106,7 @@ public abstract class Turret : MonoBehaviour
         _currentMagazine = MagazineSize;
     }
 
-    private void CheckOnReload()
+    void CheckOnReload()
     {
         if (_currentMagazine <= 0)
         {
@@ -100,28 +120,12 @@ public abstract class Turret : MonoBehaviour
         }
     }
 
-    private void CheckOnShoot()
+    void CheckOnShoot()
     {
         if (_enemiesInRange.Count > 0 && _currentMagazine > 0)
         {
             _shootTimer += Time.deltaTime;
             if (_shootTimer >= ShootRate) Shoot();
-        }
-    }
-
-    private void OnCollisionEnter(Collision other)
-    {
-        //if (other.gameObject.TryGetComponent()) Component for enemy
-        {
-            _enemiesInRange.Add(other.gameObject); //add the component
-        }
-    }
-
-    private void OnCollisionExit(Collision other)
-    {
-        //if (other.gameObject.TryGetComponent()) Component for enemy
-        {
-            _enemiesInRange.Remove(other.gameObject); //add the component
         }
     }
 }

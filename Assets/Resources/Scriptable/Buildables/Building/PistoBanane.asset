@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   category: {fileID: 11400000, guid: 56794ddf5da15934d967c613fb99e3a6, type: 2}
   uiCategory: {fileID: 11400000, guid: 499823653af7d0d49a720218e89252b6, type: 2}
-  tileBase: {fileID: 11400000, guid: 41220921f899b824b9f551bf92cb8240, type: 2}
+  tileBase: {fileID: 11400000, guid: a3f4a2ff3076b964b9190d00799368cf, type: 2}
   placeType: 1
   usePlacementRestriction: 0
   placementRestriction: []
+  isWall: 0
+  isInvisible: 0
