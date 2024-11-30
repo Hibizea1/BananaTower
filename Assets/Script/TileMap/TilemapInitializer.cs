@@ -36,5 +36,7 @@ public class TilemapInitializer : Singleton<TilemapInitializer>
             
             _buildingCreator.TilemapForPathFinding(map);
         }
+        
+        EventMaster.GetInstance().InvokeEvent("StartPath");
     }
 }

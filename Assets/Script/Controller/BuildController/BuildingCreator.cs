@@ -18,6 +18,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
 
     static readonly int CellSize = Shader.PropertyToID("_CellSize");
     [SerializeField] Tilemap previewMap, defaultMap, debugMap;
+    [SerializeField] TileBase goalTile, startTile;
 
     [SerializeField] List<Tilemap> forbidPlacingWithMaps;
     [SerializeField] Renderer gridRenderer;
@@ -43,7 +44,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
     Stack<Vector3Int> _path;
 
     public Stack<Vector3Int> Path => _path;
-    
+
     List<Vector3Int> _waterTiles = new List<Vector3Int>();
     List<Vector3Int> _turretTiles = new List<Vector3Int>();
     BuildingObjectBase _selectedObj;
@@ -53,6 +54,8 @@ public class BuildingCreator : Singleton<BuildingCreator>
     TileType _tileType;
     bool _startPosSet, _goalPosSet;
     List<Tilemap> _mapsPathFinding = new List<Tilemap>();
+
+    EventMaster _eventMaster;
 
     #endregion
 
@@ -99,9 +102,14 @@ public class BuildingCreator : Singleton<BuildingCreator>
 
     void Start()
     {
+        _eventMaster = EventMaster.GetInstance();
         UpdateGridVisual();
         EnableGridVisual(false);
         TilemapForPathFinding(defaultMap);
+        _eventMaster.CreateNewEvent("StartPath");
+        _eventMaster.CreateNewEvent("ReloadPath");
+        _eventMaster.GetEvent("StartPath").AddListener(GetGoalAndStart);
+        _eventMaster.GetEvent("ReloadPath").AddListener(Reset);
     }
 
     void Update()
@@ -131,7 +139,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
         _input.Player.MouseLeftClick.started += OnLeftClick;
         _input.Player.MouseLeftClick.canceled += OnLeftClick;
         _input.Player.MouseRightClick.performed += OnRightClick;
-        _input.Player.LoadPathDebug.performed += Reset;
+        // _input.Player.LoadPathDebug.performed += Reset;
         _input.Player.DebugMode.performed += ShowAndHideDebugMode;
     }
 
@@ -143,7 +151,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
         _input.Player.MouseRightClick.performed -= OnRightClick;
         _input.Player.MouseLeftClick.started -= OnLeftClick;
         _input.Player.MouseLeftClick.canceled -= OnLeftClick;
-        _input.Player.LoadPathDebug.performed -= Reset;
+        // _input.Player.LoadPathDebug.performed -= Reset;
         _input.Player.DebugMode.performed += ShowAndHideDebugMode;
         // _pathFinding.RemoveListener(Algorithm);
     }
@@ -291,7 +299,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
             return finalPath;
         }
 
-        return null; 
+        return null;
     }
 
     bool ConnectedDiagonally(Node currentNode, Node neighborNode)
@@ -409,6 +417,29 @@ public class BuildingCreator : Singleton<BuildingCreator>
 
     #endregion
 
+    void GetGoalAndStart()
+    {
+        foreach (var pos in defaultMap.cellBounds.allPositionsWithin)
+        {
+            if (defaultMap.GetTile(pos) == goalTile)
+            {
+                _goalPos = pos;
+                _goalPosSet = true;
+            }
+            else if (defaultMap.GetTile(pos) == startTile)
+            {
+                _startPos = pos;
+                _startPosSet = true;
+            }
+        }
+
+        if (_startPosSet && _goalPosSet)
+        {
+            Algorithm();
+        }
+    }
+
+
     void UpdatePreview()
     {
         previewMap.SetTile(_lastGridPosition, null);
@@ -417,16 +448,29 @@ public class BuildingCreator : Singleton<BuildingCreator>
 
     }
 
-    bool IsForbidden(Vector3Int pos)
+   bool IsForbidden(Vector3Int pos)
+{
+    if (_selectedObj == null) return false;
+
+    List<BuildingCategory> restrictedCategories = _selectedObj.PlacementRestriction;
+    List<Tilemap> restrictedMaps = restrictedCategories.ConvertAll(category => category.Tilemap);
+    List<Tilemap> allMaps = forbidPlacingWithMaps.Concat(restrictedMaps).ToList();
+
+    foreach (Tilemap map in allMaps)
     {
-        if (_selectedObj == null) return false;
+        if (map.HasTile(pos))
+        {
+            if (map.GetTile(pos) == pathTile.Tile)
+            {
+                return false;
+            }
 
-        List<BuildingCategory> restrictedCategories = _selectedObj.PlacementRestriction;
-        List<Tilemap> restrictedMaps = restrictedCategories.ConvertAll(category => category.Tilemap);
-        List<Tilemap> allMaps = forbidPlacingWithMaps.Concat(restrictedMaps).ToList();
-
-        return allMaps.Any(map => { return map.HasTile(pos); });
+            return true;
+        }
     }
+
+    return false;
+}
 
     void HandleDrawing()
     {
@@ -539,18 +583,6 @@ public class BuildingCreator : Singleton<BuildingCreator>
 
                 TileBase newTileBase = tile;
                 map.SetTile(position, newTileBase);
-
-                if (_tileType == TileType.Start && !_startPosSet)
-                {
-                    _startPos = position;
-                    _startPosSet = true;
-                }
-                else if (_tileType == TileType.Goal && !_goalPosSet)
-                {
-                    _goalPos = position;
-                    _goalPosSet = true;
-                }
-
             }
             else
             {
@@ -559,13 +591,9 @@ public class BuildingCreator : Singleton<BuildingCreator>
                 _waterTiles.Add(position);
                 map.SetTile(position, newTileBase);
             }
-
         }
 
-        if (_startPosSet && _goalPosSet)
-        {
-            Algorithm();
-        }
+        _eventMaster.InvokeEvent("ReloadPath");
     }
 
 
@@ -582,7 +610,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
             CellSize, new Vector4(cellSize, cellSize, 0, 0));
     }
 
-    public void Reset(InputAction.CallbackContext obj)
+    public void Reset()
     {
         AStarDebug.Instance.Reset();
         Tilemap map = _mapsPathFinding.FirstOrDefault(t => t.name == "Tilemap_Map");
@@ -606,12 +634,11 @@ public class BuildingCreator : Singleton<BuildingCreator>
             }
         }
 
-        _startPosSet = false;
-        _goalPosSet = false;
         _allNodes.Clear();
         _waterTiles.Clear();
         _path = null;
         _current = null;
+        Algorithm();
 
     }
 }

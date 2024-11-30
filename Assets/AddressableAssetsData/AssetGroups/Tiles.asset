@@ -80,6 +80,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3c909a9dfb5508d4cbab6901a69c5f3c
+    m_Address: DebugTiles
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 3f2c5b0fc6832de4185c0a84b1a800d8
     m_Address: GrassTop 10
     m_ReadOnly: 0

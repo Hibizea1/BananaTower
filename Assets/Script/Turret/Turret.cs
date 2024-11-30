@@ -58,6 +58,8 @@ public abstract class Turret : MonoBehaviour
 
     [SerializeField] private List<MonkeyBase> _enemiesInRange;
 
+    public List<MonkeyBase> EnemiesInRange { get; protected set; }
+
     private void Start()
     {
         _enemiesInRange = new List<MonkeyBase>();
@@ -68,6 +70,7 @@ public abstract class Turret : MonoBehaviour
         _shootTimer = 0;
 
         _detectionCollider.radius = _range;
+        transform.GetChild(0).localScale = new Vector3(_range*2, _range*2, 1);
     }
 
     void Update()
