@@ -182,7 +182,7 @@ namespace Script.Controller.Save
                     turret.transform.position,
                     turret.Damage,
                     turret.Range,
-                    turret.ShootRate,
+                    turret.TimeToShoot,
                     turret.MagazineSize,
                     turret.ReloadTime,
                     turret.name

@@ -39,7 +39,7 @@ public class BagaSinge : MonkeyBase
         if (_path.Count > 0)
         {
             Vector3 direction = (_currentNode - transform.position).normalized;
-            transform.position += direction * _speed * Time.deltaTime;
+            transform.position += direction * Speed * Time.deltaTime;
         }
     }
 
