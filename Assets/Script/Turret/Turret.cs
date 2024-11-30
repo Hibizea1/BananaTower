@@ -70,11 +70,21 @@ public abstract class Turret : MonoBehaviour
         _detectionCollider.radius = _range;
     }
 
-    private void Update()
+    void Update()
     {
         CheckOnReload();
 
         CheckOnShoot();
+    }
+
+    public void LoadData(int damage, int range, float shootRate, int magazineSize, float reloadTime, string loadName)
+    {
+        Damage = damage;
+        Range = range;
+        TimeToShoot = shootRate;
+        MagazineSize = magazineSize;
+        ReloadTime = reloadTime;
+        name = loadName;
     }
 
     protected virtual void Shoot()
@@ -83,7 +93,6 @@ public abstract class Turret : MonoBehaviour
         //TODO : Instantiate projectile maybe deal damage with projectile
         Debug.Log("Bang");
     }
-
     public abstract void Upgrade();
 
     protected virtual void Reload()

@@ -134,6 +134,24 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""LoadPathDebug"",
+                    ""type"": ""Button"",
+                    ""id"": ""8eebfef2-db3c-4f52-91ab-28a2251ebae3"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""DebugMode"",
+                    ""type"": ""Button"",
+                    ""id"": ""f9613a8a-5fe8-40b0-8ac1-e5ebe238b10f"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -554,6 +572,50 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""action"": ""MousePosition"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""acd9359b-c92a-433d-9288-ae269ad1c2c8"",
+                    ""path"": ""<Keyboard>/p"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LoadPathDebug"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""One Modifier"",
+                    ""id"": ""f29bdc2e-cf08-4f4d-acba-99ef4f0f4541"",
+                    ""path"": ""OneModifier(overrideModifiersNeedToBePressedFirst=true)"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DebugMode"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""modifier"",
+                    ""id"": ""4f77ac94-2e70-47ac-9c9f-071f69858f5a"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DebugMode"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""36079130-f957-4fc2-b874-4999411452e1"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DebugMode"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         },
@@ -1151,6 +1213,8 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         m_Player_MouseLeftClick = m_Player.FindAction("MouseLeftClick", throwIfNotFound: true);
         m_Player_MouseRightClick = m_Player.FindAction("MouseRightClick", throwIfNotFound: true);
         m_Player_MousePosition = m_Player.FindAction("MousePosition", throwIfNotFound: true);
+        m_Player_LoadPathDebug = m_Player.FindAction("LoadPathDebug", throwIfNotFound: true);
+        m_Player_DebugMode = m_Player.FindAction("DebugMode", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1242,6 +1306,8 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_MouseLeftClick;
     private readonly InputAction m_Player_MouseRightClick;
     private readonly InputAction m_Player_MousePosition;
+    private readonly InputAction m_Player_LoadPathDebug;
+    private readonly InputAction m_Player_DebugMode;
     public struct PlayerActions
     {
         private @PlayerInput m_Wrapper;
@@ -1258,6 +1324,8 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         public InputAction @MouseLeftClick => m_Wrapper.m_Player_MouseLeftClick;
         public InputAction @MouseRightClick => m_Wrapper.m_Player_MouseRightClick;
         public InputAction @MousePosition => m_Wrapper.m_Player_MousePosition;
+        public InputAction @LoadPathDebug => m_Wrapper.m_Player_LoadPathDebug;
+        public InputAction @DebugMode => m_Wrapper.m_Player_DebugMode;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1303,6 +1371,12 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @MousePosition.started += instance.OnMousePosition;
             @MousePosition.performed += instance.OnMousePosition;
             @MousePosition.canceled += instance.OnMousePosition;
+            @LoadPathDebug.started += instance.OnLoadPathDebug;
+            @LoadPathDebug.performed += instance.OnLoadPathDebug;
+            @LoadPathDebug.canceled += instance.OnLoadPathDebug;
+            @DebugMode.started += instance.OnDebugMode;
+            @DebugMode.performed += instance.OnDebugMode;
+            @DebugMode.canceled += instance.OnDebugMode;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -1343,6 +1417,12 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @MousePosition.started -= instance.OnMousePosition;
             @MousePosition.performed -= instance.OnMousePosition;
             @MousePosition.canceled -= instance.OnMousePosition;
+            @LoadPathDebug.started -= instance.OnLoadPathDebug;
+            @LoadPathDebug.performed -= instance.OnLoadPathDebug;
+            @LoadPathDebug.canceled -= instance.OnLoadPathDebug;
+            @DebugMode.started -= instance.OnDebugMode;
+            @DebugMode.performed -= instance.OnDebugMode;
+            @DebugMode.canceled -= instance.OnDebugMode;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -1537,6 +1617,8 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         void OnMouseLeftClick(InputAction.CallbackContext context);
         void OnMouseRightClick(InputAction.CallbackContext context);
         void OnMousePosition(InputAction.CallbackContext context);
+        void OnLoadPathDebug(InputAction.CallbackContext context);
+        void OnDebugMode(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {

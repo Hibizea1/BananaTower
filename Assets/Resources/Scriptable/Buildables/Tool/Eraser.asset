@@ -18,4 +18,6 @@ MonoBehaviour:
   placeType: 3
   usePlacementRestriction: 0
   placementRestriction: []
+  isWall: 0
+  isInvisible: 0
   toolType: 1

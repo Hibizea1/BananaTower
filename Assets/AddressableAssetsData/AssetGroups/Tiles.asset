@@ -65,18 +65,23 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 32f1a09d635d1134fba9bda6ddeffbcf
+    m_Address: Grass
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 37322b3654677ff4f9287e09bf01561f
     m_Address: RockBottom 8
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 3f2c5b0fc6832de4185c0a84b1a800d8
-    m_Address: GrassTop 10
+  - m_GUID: 37871f6bbd400d342976f11283e164d4
+    m_Address: Path 1
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 41220921f899b824b9f551bf92cb8240
-    m_Address: Turret
+  - m_GUID: 3f2c5b0fc6832de4185c0a84b1a800d8
+    m_Address: GrassTop 10
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -150,6 +155,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8d70e6dfc241f0a46aab983d1035669a
+    m_Address: Goal
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9b29f312f155c894286465158e46c237
     m_Address: GrassBottom 8
     m_ReadOnly: 0
@@ -165,6 +175,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9d039bac5301ce94b9170ea6d3b83a56
+    m_Address: Start
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a1e770bee1e1375408799fef12b924d0
     m_Address: GrassBottom 3
     m_ReadOnly: 0
@@ -172,6 +187,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a26f848e4c6100449b878ccfc38725ab
     m_Address: RockBottom 5
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a3f4a2ff3076b964b9190d00799368cf
+    m_Address: TurretTile
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -262,6 +282,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: dd3dbc4e66814f5479cdf39eb9024d54
     m_Address: GrassBottom 10
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e753677c657698847a5551369fe94873
+    m_Address: Water
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
