@@ -1,5 +1,9 @@
+#region
+
 using TMPro;
 using UnityEngine;
+
+#endregion
 
 public class DebugText : MonoBehaviour
 {
@@ -34,13 +38,7 @@ public class DebugText : MonoBehaviour
 
     public RectTransform Arrow
     {
-        get
-        {
-            return arrow;
-        }
-        set
-        {
-            arrow = value;
-        }
+        get => arrow;
+        set => arrow = value;
     }
 }

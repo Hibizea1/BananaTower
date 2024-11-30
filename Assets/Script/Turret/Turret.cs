@@ -18,7 +18,7 @@ public abstract class Turret : MonoBehaviour
 
     CircleCollider2D _detectionCollider;
 
-    List<GameObject> _enemiesInRange; //set to enemy class for optimisation
+    protected List<GameObject> EnemiesInRange; //set to enemy class for optimisation
 
     float _reloadTimer;
     float _shootTimer;
@@ -55,7 +55,7 @@ public abstract class Turret : MonoBehaviour
 
     void Start()
     {
-        _enemiesInRange = new List<GameObject>();
+        EnemiesInRange = new List<GameObject>();
         _detectionCollider = GetComponent<CircleCollider2D>();
 
         _currentMagazine = MagazineSize;
@@ -76,7 +76,7 @@ public abstract class Turret : MonoBehaviour
     {
         //if (other.gameObject.TryGetComponent()) Component for enemy
         {
-            _enemiesInRange.Add(other.gameObject); //add the component
+            EnemiesInRange.Add(other.gameObject); //add the component
         }
     }
 
@@ -84,7 +84,7 @@ public abstract class Turret : MonoBehaviour
     {
         //if (other.gameObject.TryGetComponent()) Component for enemy
         {
-            _enemiesInRange.Remove(other.gameObject); //add the component
+            EnemiesInRange.Remove(other.gameObject); //add the component
         }
     }
 
@@ -122,7 +122,7 @@ public abstract class Turret : MonoBehaviour
 
     void CheckOnShoot()
     {
-        if (_enemiesInRange.Count > 0 && _currentMagazine > 0)
+        if (EnemiesInRange.Count > 0 && _currentMagazine > 0)
         {
             _shootTimer += Time.deltaTime;
             if (_shootTimer >= ShootRate) Shoot();

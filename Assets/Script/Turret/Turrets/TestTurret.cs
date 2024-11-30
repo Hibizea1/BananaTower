@@ -14,6 +14,8 @@ public class TestTurret : Turret, ITurretEffect
 
     protected override void Shoot()
     {
+        var enemiesClosest = EnemiesInRange[0];
+        enemiesClosest.GetComponent<MonkeyBase>().TakeDamage(Damage);
     }
 
     public override void Upgrade()

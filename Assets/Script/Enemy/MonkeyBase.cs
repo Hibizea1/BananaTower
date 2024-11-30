@@ -6,10 +6,10 @@ using UnityEngine;
 
 public abstract class MonkeyBase : MonoBehaviour
 {
-    [SerializeField] int _damage;
-    [SerializeField] int _health;
-    [SerializeField] int _bananasOnDeath;
-    [SerializeField] float _speed;
+    [SerializeField] protected int _damage;
+    [SerializeField] protected int _health;
+    [SerializeField] protected int _bananasOnDeath;
+    [SerializeField] protected float _speed;
 
 
     void Update()

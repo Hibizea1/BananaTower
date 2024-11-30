@@ -10,9 +10,11 @@ public class TilemapInitializer : Singleton<TilemapInitializer>
 {
     [SerializeField] List<BuildingCategory> categoriesToCreateTilemapFor;
     [SerializeField] Transform grid;
+    BuildingCreator _buildingCreator;
 
     void Start()
     {
+        _buildingCreator = GetComponent<BuildingCreator>();
         CreateMap();
     }
 
@@ -31,6 +33,8 @@ public class TilemapInitializer : Singleton<TilemapInitializer>
             tr.sortingOrder = category.SortingOrder;
 
             category.Tilemap = map;
+            
+            _buildingCreator.TilemapForPathFinding(map);
         }
     }
 }

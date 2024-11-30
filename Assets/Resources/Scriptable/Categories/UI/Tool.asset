@@ -9,15 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d03be886bd020c745903091f18c44a19, type: 3}
-  m_Name: Eraser
+  m_Script: {fileID: 11500000, guid: 83ef9beb5ed000e42b813aae071bc3b8, type: 3}
+  m_Name: Tool
   m_EditorClassIdentifier: 
-  category: {fileID: 0}
-  uiCategory: {fileID: 0}
-  tileBase: {fileID: 0}
-  placeType: 3
-  usePlacementRestriction: 0
-  placementRestriction: []
-  isWall: 0
-  isInvisible: 0
-  toolType: 1
+  siblingIndex: 3
+  backgroundColor: {r: 0, g: 0.097765446, b: 1, a: 1}
