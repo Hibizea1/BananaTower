@@ -57,7 +57,7 @@ public abstract class MonkeyBase : MonoBehaviour
     private void Die()
     {
         //TODO : monkey death
-        Destroy(this);
+        Destroy(gameObject);
     }
 
     public abstract void SpecialAbility();

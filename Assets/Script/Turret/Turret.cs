@@ -1,14 +1,20 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [RequireComponent(typeof(CircleCollider2D))]
 public abstract class Turret : MonoBehaviour
 {
     [SerializeField] private int _damage;
     [SerializeField] private int _range;
-    [SerializeField] private float _shootRate;
+
+    [FormerlySerializedAs("_timeToShoot")] [SerializeField]
+    private float _timeToTimeToShoot;
+
     [SerializeField] private int _magazineSize;
     [SerializeField] private float _reloadTime;
+
+    #region PropertySettings
 
     public int Damage
     {
@@ -22,10 +28,10 @@ public abstract class Turret : MonoBehaviour
         protected set => _range = value;
     }
 
-    public float ShootRate
+    public float TimeToShoot
     {
-        get => _shootRate;
-        protected set => _shootRate = value;
+        get => _timeToTimeToShoot;
+        protected set => _timeToTimeToShoot = value;
     }
 
     public int MagazineSize
@@ -40,6 +46,9 @@ public abstract class Turret : MonoBehaviour
         protected set => _reloadTime = value;
     }
 
+    #endregion
+
+
     private int _currentMagazine;
 
     private float _reloadTimer;
@@ -47,18 +56,18 @@ public abstract class Turret : MonoBehaviour
 
     private CircleCollider2D _detectionCollider;
 
-    private List<GameObject> _enemiesInRange; //set to enemy class for optimisation
+    [SerializeField] private List<MonkeyBase> _enemiesInRange;
 
     private void Start()
     {
-        _enemiesInRange = new List<GameObject>();
+        _enemiesInRange = new List<MonkeyBase>();
         _detectionCollider = GetComponent<CircleCollider2D>();
 
-        _currentMagazine = MagazineSize;
+        _currentMagazine = _magazineSize;
         _reloadTimer = 0;
         _shootTimer = 0;
 
-        _detectionCollider.radius = Range;
+        _detectionCollider.radius = _range;
     }
 
     private void Update()
@@ -68,17 +77,13 @@ public abstract class Turret : MonoBehaviour
         CheckOnShoot();
     }
 
-    public void LoadData(int damage, int range, float shootRate, int magazineSize, float reloadTime, string loadName)
+    protected virtual void Shoot()
     {
-        Damage = damage;
-        Range = range;
-        ShootRate = shootRate;
-        MagazineSize = magazineSize;
-        ReloadTime = reloadTime;
-        name = loadName;
+        _enemiesInRange[0].TakeDamage(_damage);
+        //TODO : Instantiate projectile maybe deal damage with projectile
+        Debug.Log("Bang");
     }
 
-    protected abstract void Shoot();
     public abstract void Upgrade();
 
     protected virtual void Reload()
@@ -95,7 +100,7 @@ public abstract class Turret : MonoBehaviour
             if (_reloadTimer >= ReloadTime)
             {
                 Reload();
-                _reloadTimer = ReloadTime;
+                _reloadTimer = 0.0f;
             }
         }
     }
@@ -105,23 +110,25 @@ public abstract class Turret : MonoBehaviour
         if (_enemiesInRange.Count > 0 && _currentMagazine > 0)
         {
             _shootTimer += Time.deltaTime;
-            if (_shootTimer >= ShootRate) Shoot();
+            if (_shootTimer >= TimeToShoot)
+            {
+                Shoot();
+                _shootTimer = 0.0f;
+            }
         }
     }
 
-    private void OnCollisionEnter(Collision other)
+
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        //if (other.gameObject.TryGetComponent()) Component for enemy
-        {
-            _enemiesInRange.Add(other.gameObject); //add the component
-        }
+        Debug.Log("Trigger");
+        if (other.gameObject.TryGetComponent(out MonkeyBase c))
+            _enemiesInRange.Add(c);
     }
 
-    private void OnCollisionExit(Collision other)
+    private void OnTriggerExit2D(Collider2D other)
     {
-        //if (other.gameObject.TryGetComponent()) Component for enemy
-        {
-            _enemiesInRange.Remove(other.gameObject); //add the component
-        }
+        if (other.gameObject.TryGetComponent(out MonkeyBase c))
+            _enemiesInRange.Remove(c);
     }
 }

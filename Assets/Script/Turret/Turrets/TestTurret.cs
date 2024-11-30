@@ -1,17 +1,12 @@
-using System.Collections;
+using UnityEngine;
 
-public class TestTurret : Turret, ITurretEffect
+public class TestTurret : Turret
 {
-    protected override void Shoot()
-    {
-    }
-
+    [ContextMenu("TestUpgrade")]
     public override void Upgrade()
     {
+        Damage += 1;
     }
 
-    IEnumerator ITurretEffect.ApplyEffect()
-    {
-        throw new System.NotImplementedException();
-    }
+   
 }
