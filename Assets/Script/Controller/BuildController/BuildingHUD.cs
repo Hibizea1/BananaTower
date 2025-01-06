@@ -15,6 +15,7 @@ public class BuildingHUD : Singleton<BuildingHUD>
     [SerializeField] GameObject categoryPrefab;
     [SerializeField] GameObject itemPrefab;
     [SerializeField] GameObject buildingButtonPanel;
+    [SerializeField] bool debugAll;
     readonly Dictionary<GameObject, Transform> _elementItemSlot = new Dictionary<GameObject, Transform>();
 
 
@@ -84,20 +85,20 @@ public class BuildingHUD : Singleton<BuildingHUD>
                     btn.TileType = ((AStarTile)script.Item.Tile).Type;
                 }
 
-                print("Type is : " + inst.GetComponent<TileButton>().TileType);
+                if (debugAll)
+                {
+                    print("Type is : " + inst.GetComponent<TileButton>().TileType);
+                }
             }
             else
             {
-                var itemsParent = _elementItemSlot[_uiElement[b.UiCategory]];
-
-                var inst = Instantiate(itemPrefab, Vector3.zero, Quaternion.identity);
+                Transform itemsParent = _elementItemSlot[_uiElement[b.UiCategory]];
+                GameObject inst = Instantiate(itemPrefab, Vector3.zero, Quaternion.identity);
                 inst.transform.SetParent(itemsParent, false);
-
-                var img = inst.GetComponent<Image>();
-                var t = (Tile)b.Tile;
+                Image img = inst.GetComponent<Image>();
+                Tile t = (Tile)b.Tile;
                 img.sprite = t.sprite;
-
-                var script = inst.GetComponent<BuildingBoutonHandler>();
+                BuildingBoutonHandler script = inst.GetComponent<BuildingBoutonHandler>();
                 script.Item = b;
                 script.Panel = buildingButtonPanel.GetComponent<SetBuildingPanel>();
             }

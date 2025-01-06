@@ -9,14 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 41f7653873e0071449521948dbd09438, type: 3}
-  m_Name: Path
+  m_Script: {fileID: 11500000, guid: e437e956bab6e2d42a7e78310408f016, type: 3}
+  m_Name: Wall
   m_EditorClassIdentifier: 
-  category: {fileID: 11400000, guid: 57d1069d85a327247b53cd1ef2db299c, type: 2}
-  uiCategory: {fileID: 0}
-  tileBase: {fileID: 11400000, guid: 37871f6bbd400d342976f11283e164d4, type: 2}
   placeType: 1
-  usePlacementRestriction: 0
+  sortingOrder: 6
   placementRestriction: []
-  isWall: 0
-  isInvisible: 1

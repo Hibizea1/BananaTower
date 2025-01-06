@@ -23,8 +23,6 @@ public class TilemapInitializer : Singleton<TilemapInitializer>
         foreach (var category in categoriesToCreateTilemapFor)
         {
             var obj = new GameObject("Tilemap_" + category.name);
-
-
             var map = obj.AddComponent<Tilemap>();
             var tr = obj.AddComponent<TilemapRenderer>();
 

@@ -20,6 +20,7 @@ public class AStarDebug : MonoBehaviour
 
 
     readonly List<GameObject> _debugObjects = new List<GameObject>();
+    [SerializeField] bool debugAll;
 
     public static AStarDebug Instance
     {
@@ -73,7 +74,10 @@ public class AStarDebug : MonoBehaviour
         tilemap.SetTile(position, tile);
         tilemap.SetTileFlags(position, TileFlags.None);
         tilemap.SetColor(position, color);
-        print("Tile as been set at : " + position);
+        if (debugAll)
+        {
+            print("Tile as been set at : " + position);
+        }
     }
 
     public void ShowDebugMode()

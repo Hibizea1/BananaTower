@@ -10,12 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 41f7653873e0071449521948dbd09438, type: 3}
-  m_Name: Water
+  m_Name: Wall_V
   m_EditorClassIdentifier: 
-  category: {fileID: 11400000, guid: 57d1069d85a327247b53cd1ef2db299c, type: 2}
-  uiCategory: {fileID: 11400000, guid: 0f3f9bc0255e5e3428a497c7a3237a77, type: 2}
-  tileBase: {fileID: 11400000, guid: e753677c657698847a5551369fe94873, type: 2}
+  category: {fileID: 11400000, guid: 26edb15d8f72864438a164683eebffab, type: 2}
+  uiCategory: {fileID: 11400000, guid: 455edb219eade9646b76ae14a59d7f48, type: 2}
+  tileBase: {fileID: 11400000, guid: 4d12afbddbabb394fa01554f5fc7ed13, type: 2}
   placeType: 1
   usePlacementRestriction: 0
   placementRestriction: []
   isWall: 1
+  isInvisible: 0

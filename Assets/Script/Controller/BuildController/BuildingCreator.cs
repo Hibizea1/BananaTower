@@ -18,7 +18,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
 
     static readonly int CellSize = Shader.PropertyToID("_CellSize");
     [SerializeField] Tilemap previewMap, defaultMap, debugMap;
-    [SerializeField] TileBase goalTile, startTile;
+    [SerializeField] TileBase goalTile, startTile, wallTile, grassTile;
 
     [SerializeField] List<Tilemap> forbidPlacingWithMaps;
     [SerializeField] Renderer gridRenderer;
@@ -46,6 +46,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
     public Stack<Vector3Int> Path => _path;
 
     List<Vector3Int> _waterTiles = new List<Vector3Int>();
+    List<Vector3Int> _wallTiles = new List<Vector3Int>();
     List<Vector3Int> _turretTiles = new List<Vector3Int>();
     BuildingObjectBase _selectedObj;
     Vector3Int _startPos, _goalPos;
@@ -53,7 +54,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
     TileBase _tileBase;
     TileType _tileType;
     bool _startPosSet, _goalPosSet;
-    List<Tilemap> _mapsPathFinding = new List<Tilemap>();
+    [SerializeField] List<Tilemap> _mapsPathFinding = new List<Tilemap>();
 
     EventMaster _eventMaster;
 
@@ -216,7 +217,8 @@ public class BuildingCreator : Singleton<BuildingCreator>
         {
             var neighborPos = new Vector3Int(parentPosition.x - x, parentPosition.y - y, parentPosition.z);
             if (y != 0 || x != 0)
-                if (neighborPos != _startPos && TilemapForPath(neighborPos) && !_waterTiles.Contains(neighborPos) &&
+                if (neighborPos != _startPos && TilemapForPath(neighborPos) &&
+                    (!_waterTiles.Contains(neighborPos) && !_wallTiles.Contains(neighborPos)) &&
                     !_turretTiles.Contains(neighborPos))
                 {
                     var neighbor = GetNode(neighborPos);
@@ -398,19 +400,9 @@ public class BuildingCreator : Singleton<BuildingCreator>
 
     public void ObjectSelected(BuildingObjectBase obj)
     {
-        if (obj.IsWall)
-        {
-            SelectedObj = obj;
-            var selelected = (AStarTileRule)_selectedObj.Tile;
-            _tileType = selelected.Type;
-        }
-        else
-        {
-            SelectedObj = obj;
-            var selected = (AStarTile)_selectedObj.Tile;
-            _tileType = selected.Type;
-        }
-
+        SelectedObj = obj;
+        var selected = (AStarTile)_selectedObj.Tile;
+        _tileType = selected.Type;
 
         EnableGridVisual(true);
     }
@@ -419,6 +411,14 @@ public class BuildingCreator : Singleton<BuildingCreator>
 
     void GetGoalAndStart()
     {
+        foreach (Vector3Int pos in defaultMap.cellBounds.allPositionsWithin)
+        {
+            if (defaultMap.GetTile(pos) == wallTile)
+            {
+                _wallTiles.Add(pos);
+            }
+        }
+
         foreach (var pos in defaultMap.cellBounds.allPositionsWithin)
         {
             if (defaultMap.GetTile(pos) == goalTile)
@@ -448,29 +448,29 @@ public class BuildingCreator : Singleton<BuildingCreator>
 
     }
 
-   bool IsForbidden(Vector3Int pos)
-{
-    if (_selectedObj == null) return false;
-
-    List<BuildingCategory> restrictedCategories = _selectedObj.PlacementRestriction;
-    List<Tilemap> restrictedMaps = restrictedCategories.ConvertAll(category => category.Tilemap);
-    List<Tilemap> allMaps = forbidPlacingWithMaps.Concat(restrictedMaps).ToList();
-
-    foreach (Tilemap map in allMaps)
+    bool IsForbidden(Vector3Int pos)
     {
-        if (map.HasTile(pos))
+        if (_selectedObj == null) return false;
+
+        List<BuildingCategory> restrictedCategories = _selectedObj.PlacementRestriction;
+        List<Tilemap> restrictedMaps = restrictedCategories.ConvertAll(category => category.Tilemap);
+        List<Tilemap> allMaps = forbidPlacingWithMaps.Concat(restrictedMaps).ToList();
+
+        foreach (Tilemap map in allMaps)
         {
-            if (map.GetTile(pos) == pathTile.Tile)
+            if (map.HasTile(pos))
             {
-                return false;
+                if (map.GetTile(pos) == pathTile.Tile)
+                {
+                    return false;
+                }
+
+                return true;
             }
-
-            return true;
         }
-    }
 
-    return false;
-}
+        return false;
+    }
 
     void HandleDrawing()
     {
@@ -558,9 +558,15 @@ public class BuildingCreator : Singleton<BuildingCreator>
             DrawItem(map, new Vector3Int(x, y, 0), _tileBase);
     }
 
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="map"></param>
+    /// <param name="position"></param>
+    /// <param name="tileBase"></param>
     void DrawItem(Tilemap map, Vector3Int position, TileBase tileBase)
     {
-
         if (map != previewMap && _selectedObj.GetType() == typeof(BuildingTool))
         {
             var tool = (BuildingTool)_selectedObj;
@@ -568,7 +574,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
         }
         else if (!IsForbidden(position))
         {
-            if (_tileType != TileType.Water)
+            if (_tileType != TileType.Wall)
             {
                 var tile = (AStarTile)_tileBase;
                 if (tile.gameObject != null)
@@ -586,9 +592,9 @@ public class BuildingCreator : Singleton<BuildingCreator>
             }
             else
             {
-                var tile = (AStarTileRule)_tileBase;
+                var tile = (AStarTile)_tileBase;
                 TileBase newTileBase = tile;
-                _waterTiles.Add(position);
+                _wallTiles.Add(position);
                 map.SetTile(position, newTileBase);
             }
         }
@@ -609,36 +615,37 @@ public class BuildingCreator : Singleton<BuildingCreator>
         gridRenderer.sharedMaterial.SetVector(
             CellSize, new Vector4(cellSize, cellSize, 0, 0));
     }
-
+    
     public void Reset()
     {
         AStarDebug.Instance.Reset();
         Tilemap map = _mapsPathFinding.FirstOrDefault(t => t.name == "Tilemap_Map");
-
-        if (map != null)
+        
+        foreach (Tilemap tilemap in _mapsPathFinding)
         {
-            foreach (Vector3Int nodesKey in _allNodes.Keys)
+            if (tilemap != null && map != null)
             {
-                if (map.GetTile(nodesKey) != null)
+                foreach (Vector3Int nodesKey in _allNodes.Keys)
                 {
-                    map.SetTile(nodesKey, null);
+                    if (tilemap.GetTile(nodesKey) != grassTile && tilemap.GetTile(nodesKey) != null)
+                    {
+                        map.SetTile(nodesKey, null);
+                    }
                 }
-            }
 
-            foreach (Vector3Int tilePos in _path)
-            {
-                if (map.GetTile(tilePos) != null)
+                foreach (Vector3Int tilePos in _path)
                 {
-                    map.SetTile(tilePos, null);
+                    if (tilemap.GetTile(tilePos) != grassTile && tilemap.GetTile(tilePos) != null)
+                    {
+                        map.SetTile(tilePos, null);
+                    }
                 }
             }
         }
 
         _allNodes.Clear();
-        _waterTiles.Clear();
         _path = null;
         _current = null;
         Algorithm();
-
     }
 }

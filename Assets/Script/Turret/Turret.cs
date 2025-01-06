@@ -93,6 +93,7 @@ public abstract class Turret : MonoBehaviour
     protected virtual void Shoot()
     {
         _enemiesInRange[0].TakeDamage(_damage);
+        EventMaster.GetInstance().InvokeEvent("CheckCount");
         //TODO : Instantiate projectile maybe deal damage with projectile
         Debug.Log("Bang");
     }
