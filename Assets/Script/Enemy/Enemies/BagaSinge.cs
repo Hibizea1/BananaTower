@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 public class BagaSinge : MonkeyBase
 {
@@ -59,6 +60,25 @@ public class BagaSinge : MonkeyBase
         {
             Debug.LogWarning("No more nodes to follow for " + transform.name);
         }
+
+        CheckIfAtGoal();
+    }
+
+    void CheckIfAtGoal()
+    {
+        foreach (Tilemap tilemap in BuildingCreator.GetInstance().MapsPathFinding)
+        {
+            if (tilemap.GetTile(_currentNode) is AStarTile tile && tile.Type == TileType.Goal)
+            {
+                DealDamage();
+            }
+        }
+    }
+
+    protected override void DealDamage()
+    {
+        EventMaster.GetInstance().InvokeEventInt("HeartDamage", _damage);
+        Die();
     }
 
     public override void SpecialAbility()

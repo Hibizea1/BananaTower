@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class WaveManager : MonoBehaviour
+public class WaveManager : Singleton<WaveManager>
 {
     int _waveCount;
     int _enemyCount;
@@ -14,10 +14,13 @@ public class WaveManager : MonoBehaviour
 
     [SerializeField] List<GameObject> Monkeys = new List<GameObject>();
 
+    bool _waveStarted;
+
+    public bool WaveStarted => _waveStarted;
+
     [SerializeField] Tile SpawnTile;
     Vector3Int _spawnTilePos;
     [SerializeField] Tilemap DefaultMap;
-
 
     EventMaster _eventMaster;
     void Awake()
@@ -36,7 +39,7 @@ public class WaveManager : MonoBehaviour
                 _spawnTilePos = pos;
             }
         }
-        SpawnBagaSinge();
+        StartCoroutine(WaitForSpawn());
     }
 
     void SpawnBagaSinge()
@@ -52,23 +55,30 @@ public class WaveManager : MonoBehaviour
             Instantiate(Monkeys[0], spawnPosition, Quaternion.identity);
             _enemyCount++;
         }
-    }
 
+        _waveStarted = true;
+    }
 
     void CheckMonkeyNumber()
     {
         if (_enemyCount <= 0)
         {
             _waveCount++;
+            _waveStarted = false;
             StartCoroutine(WaitForSpawn());
         }
     }
 
     IEnumerator WaitForSpawn()
     {
-        yield return new WaitForSeconds(10);
+        float waitTime = 100000000f;
+        while (waitTime > 0)
+        {
+            // Debug.Log("Time remaining: " + waitTime + " seconds");
+            yield return new WaitForSeconds(1);
+            waitTime -= 1;
+        }
         BagaSinge += 5;
         SpawnBagaSinge();
     }
-    
 }

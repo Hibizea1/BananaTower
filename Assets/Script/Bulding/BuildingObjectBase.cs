@@ -25,9 +25,11 @@ public class BuildingObjectBase : ScriptableObject
     [SerializeField] List<BuildingCategory> placementRestriction = new List<BuildingCategory>();
     [SerializeField] bool isWall;
     [SerializeField] bool isInvisible;
+    [SerializeField] int bananaCost;
 
     public bool IsInvisible => isInvisible;
-
+    public int BananaCost => bananaCost;
+    
     public bool IsWall => isWall;
 
     public List<BuildingCategory> PlacementRestriction =>

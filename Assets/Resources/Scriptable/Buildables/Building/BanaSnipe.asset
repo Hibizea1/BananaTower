@@ -20,3 +20,4 @@ MonoBehaviour:
   placementRestriction: []
   isWall: 0
   isInvisible: 0
+  bananaCost: 50

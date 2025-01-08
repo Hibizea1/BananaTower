@@ -1,10 +1,8 @@
 #region
 
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Interactions;
@@ -18,8 +16,8 @@ public class BuildingCreator : Singleton<BuildingCreator>
 
     static readonly int CellSize = Shader.PropertyToID("_CellSize");
     [SerializeField] Tilemap previewMap, defaultMap, debugMap;
-    [SerializeField] TileBase goalTile, startTile, wallTile, grassTile;
-
+    [SerializeField] TileBase goalTile, startTile, wallTile, grassTile, pathTileBase;
+    [SerializeField] TextScroller interdictionText;
     [SerializeField] List<Tilemap> forbidPlacingWithMaps;
     [SerializeField] Renderer gridRenderer;
     [SerializeField] float cellSize;
@@ -56,7 +54,11 @@ public class BuildingCreator : Singleton<BuildingCreator>
     bool _startPosSet, _goalPosSet;
     [SerializeField] List<Tilemap> _mapsPathFinding = new List<Tilemap>();
 
+    public List<Tilemap> MapsPathFinding => _mapsPathFinding;
+
     EventMaster _eventMaster;
+    [SerializeField] int width;
+    [SerializeField] int height;
 
     #endregion
 
@@ -179,6 +181,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
             UpdateTiles(ref _current);
 
             _path = GeneratePath(_current);
+            
         }
 
         if (_path != null)
@@ -367,6 +370,16 @@ public class BuildingCreator : Singleton<BuildingCreator>
 
     void OnLeftClick(InputAction.CallbackContext obj)
     {
+        
+        
+        
+        
+        
+        if (WaveManager.GetInstance().WaveStarted)
+        {
+            return;
+        }
+
         Debug.Log(obj.interaction + " / " + obj.phase);
 
         if (_selectedObj != null && !EventSystem.current.IsPointerOverGameObject())
@@ -400,6 +413,11 @@ public class BuildingCreator : Singleton<BuildingCreator>
 
     public void ObjectSelected(BuildingObjectBase obj)
     {
+        if (WaveManager.GetInstance().WaveStarted)
+        {
+            return;
+        }
+
         SelectedObj = obj;
         var selected = (AStarTile)_selectedObj.Tile;
         _tileType = selected.Type;
@@ -557,7 +575,8 @@ public class BuildingCreator : Singleton<BuildingCreator>
         for (var y = _bounds.yMin; y <= _bounds.yMax; y++)
             DrawItem(map, new Vector3Int(x, y, 0), _tileBase);
     }
-
+    
+    
 
     /// <summary>
     /// 
@@ -567,6 +586,21 @@ public class BuildingCreator : Singleton<BuildingCreator>
     /// <param name="tileBase"></param>
     void DrawItem(Tilemap map, Vector3Int position, TileBase tileBase)
     {
+        if (_path == null || !_path.Contains(_goalPos))
+        {
+            map.SetTile(position, null);
+            _eventMaster.InvokeEvent("ReloadPath");
+        }
+        
+        if (MoneyManager.GetInstance().GetMoneyCount() < _selectedObj.BananaCost)
+        {
+
+            interdictionText.LaunchTextScroll();
+            SelectedObj = null;
+            EnableGridVisual(false);
+            return;
+        }
+
         if (map != previewMap && _selectedObj.GetType() == typeof(BuildingTool))
         {
             var tool = (BuildingTool)_selectedObj;
@@ -599,7 +633,10 @@ public class BuildingCreator : Singleton<BuildingCreator>
             }
         }
 
+        _eventMaster.InvokeEventInt("RemoveMoney", _selectedObj.BananaCost);
         _eventMaster.InvokeEvent("ReloadPath");
+        
+
     }
 
 
@@ -615,15 +652,15 @@ public class BuildingCreator : Singleton<BuildingCreator>
         gridRenderer.sharedMaterial.SetVector(
             CellSize, new Vector4(cellSize, cellSize, 0, 0));
     }
-    
+
     public void Reset()
     {
         AStarDebug.Instance.Reset();
         Tilemap map = _mapsPathFinding.FirstOrDefault(t => t.name == "Tilemap_Map");
-        
+    
         foreach (Tilemap tilemap in _mapsPathFinding)
         {
-            if (tilemap != null && map != null)
+            if (tilemap != null && map != null && _path != null)
             {
                 foreach (Vector3Int nodesKey in _allNodes.Keys)
                 {
