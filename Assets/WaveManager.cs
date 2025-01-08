@@ -71,7 +71,7 @@ public class WaveManager : Singleton<WaveManager>
 
     IEnumerator WaitForSpawn()
     {
-        float waitTime = 100000000f;
+        float waitTime = 30f;
         while (waitTime > 0)
         {
             // Debug.Log("Time remaining: " + waitTime + " seconds");

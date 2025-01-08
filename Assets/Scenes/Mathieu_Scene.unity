@@ -697,6 +697,7 @@ MonoBehaviour:
   gridRenderer: {fileID: 1612212633}
   cellSize: 1
   pathTile: {fileID: 11400000, guid: 806aed3cb89055e449f210fb29e084a8, type: 2}
+  PathList: []
   _mapsPathFinding: []
   width: 33
   height: 17

@@ -40,6 +40,8 @@ public class BuildingCreator : Singleton<BuildingCreator>
     HashSet<Node> _openNodes, _closedNodes;
     HashSet<Vector3Int> _changedTile = new HashSet<Vector3Int>();
     Stack<Vector3Int> _path;
+    Stack<Vector3Int> _pathOld;
+    [SerializeField] List<Vector3Int> PathList = new List<Vector3Int>();
 
     public Stack<Vector3Int> Path => _path;
 
@@ -59,6 +61,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
     EventMaster _eventMaster;
     [SerializeField] int width;
     [SerializeField] int height;
+    Vector3Int _holdPosition;
 
     #endregion
 
@@ -113,6 +116,24 @@ public class BuildingCreator : Singleton<BuildingCreator>
         _eventMaster.CreateNewEvent("ReloadPath");
         _eventMaster.GetEvent("StartPath").AddListener(GetGoalAndStart);
         _eventMaster.GetEvent("ReloadPath").AddListener(Reset);
+        GetAllWallTiles();
+    }
+
+
+    void GetAllWallTiles()
+    {
+        _wallTiles.Clear(); // Clear the list before adding new tiles
+
+        foreach (Tilemap tilemap in _mapsPathFinding)
+        {
+            foreach (Vector3Int pos in tilemap.cellBounds.allPositionsWithin)
+            {
+                if (tilemap.GetTile(pos) == wallTile)
+                {
+                    _wallTiles.Add(pos);
+                }
+            }
+        }
     }
 
     void Update()
@@ -181,7 +202,6 @@ public class BuildingCreator : Singleton<BuildingCreator>
             UpdateTiles(ref _current);
 
             _path = GeneratePath(_current);
-            
         }
 
         if (_path != null)
@@ -194,10 +214,25 @@ public class BuildingCreator : Singleton<BuildingCreator>
                 }
             }
         }
+        else
+        {
+            _path = _pathOld;
+            foreach (Vector3Int pos in _path)
+            {
+                if (pos != _goalPos)
+                {
+                    pathTile.Category.Tilemap.SetTile(pos, pathTile.Tile);
+                }
+            }
+
+            _selectedObj.Category.Tilemap.SetTile(_holdPosition, null);
+            _wallTiles.Remove(_holdPosition);
+            Debug.Log("You can't Place Her");
+        }
 
         AStarDebug.Instance.CreateTiles(_openNodes, _closedNodes, _allNodes, _startPos, _goalPos, _path);
     }
-
+    
     void Initialize()
     {
         _current = GetNode(_startPos);
@@ -220,8 +255,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
         {
             var neighborPos = new Vector3Int(parentPosition.x - x, parentPosition.y - y, parentPosition.z);
             if (y != 0 || x != 0)
-                if (neighborPos != _startPos && TilemapForPath(neighborPos) &&
-                    (!_waterTiles.Contains(neighborPos) && !_wallTiles.Contains(neighborPos)) &&
+                if (neighborPos != _startPos && TilemapForPath(neighborPos) && !_wallTiles.Contains(neighborPos) &&
                     !_turretTiles.Contains(neighborPos))
                 {
                     var neighbor = GetNode(neighborPos);
@@ -370,11 +404,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
 
     void OnLeftClick(InputAction.CallbackContext obj)
     {
-        
-        
-        
-        
-        
+
         if (WaveManager.GetInstance().WaveStarted)
         {
             return;
@@ -391,6 +421,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
                 if (obj.interaction is TapInteraction) _holdStartPosition = _currentGridPosition;
 
                 HandleDrawing();
+
             }
             else
             {
@@ -400,7 +431,6 @@ public class BuildingCreator : Singleton<BuildingCreator>
                     _holdActive = false;
                     HandleDrawRelease();
                 }
-
             }
         }
     }
@@ -575,8 +605,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
         for (var y = _bounds.yMin; y <= _bounds.yMax; y++)
             DrawItem(map, new Vector3Int(x, y, 0), _tileBase);
     }
-    
-    
+
 
     /// <summary>
     /// 
@@ -586,15 +615,9 @@ public class BuildingCreator : Singleton<BuildingCreator>
     /// <param name="tileBase"></param>
     void DrawItem(Tilemap map, Vector3Int position, TileBase tileBase)
     {
-        if (_path == null || !_path.Contains(_goalPos))
-        {
-            map.SetTile(position, null);
-            _eventMaster.InvokeEvent("ReloadPath");
-        }
-        
+        _holdPosition = position;
         if (MoneyManager.GetInstance().GetMoneyCount() < _selectedObj.BananaCost)
         {
-
             interdictionText.LaunchTextScroll();
             SelectedObj = null;
             EnableGridVisual(false);
@@ -635,8 +658,6 @@ public class BuildingCreator : Singleton<BuildingCreator>
 
         _eventMaster.InvokeEventInt("RemoveMoney", _selectedObj.BananaCost);
         _eventMaster.InvokeEvent("ReloadPath");
-        
-
     }
 
 
@@ -657,7 +678,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
     {
         AStarDebug.Instance.Reset();
         Tilemap map = _mapsPathFinding.FirstOrDefault(t => t.name == "Tilemap_Map");
-    
+
         foreach (Tilemap tilemap in _mapsPathFinding)
         {
             if (tilemap != null && map != null && _path != null)
@@ -680,6 +701,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
             }
         }
 
+        _pathOld = _path;
         _allNodes.Clear();
         _path = null;
         _current = null;
