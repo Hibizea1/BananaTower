@@ -26,6 +26,9 @@ public class BuildingObjectBase : ScriptableObject
     [SerializeField] bool isWall;
     [SerializeField] bool isInvisible;
     [SerializeField] int bananaCost;
+    [SerializeField] Sprite Picture;
+
+    public Sprite Picture1 => Picture;
 
     public bool IsInvisible => isInvisible;
     public int BananaCost => bananaCost;

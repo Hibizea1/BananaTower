@@ -90,6 +90,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 421267b2e23d9c247a3f81692ecaf370
+    m_Address: TurretTileBananaTraillettes
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 440e9329c5e60cd4d964f4ee18f42b76
     m_Address: RockBottom 4
     m_ReadOnly: 0
@@ -102,6 +107,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 4c8099b8781057e4cb14552e4529a424
     m_Address: GrassTop 9
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4d12afbddbabb394fa01554f5fc7ed13
+    m_Address: Wall_Verticales
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -185,6 +195,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a02a16566e039d34ab58ed4bcfe497c3
+    m_Address: Wall
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a1e770bee1e1375408799fef12b924d0
     m_Address: GrassBottom 3
     m_ReadOnly: 0
@@ -202,6 +217,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a68de1306f1df2d4d8ecfe384759bdb1
     m_Address: RockBottom 2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: aa8e8659e502f084f82b6ddbd0a761ac
+    m_Address: grass_tile_1
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -255,6 +275,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c4228ae8c4f02084a98a4ba8b8dcd8c2
+    m_Address: TurretTileBaZouna
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: c48dc770696a86a4a8e3bbed9bc877f4
     m_Address: RockBottom 15
     m_ReadOnly: 0
@@ -272,6 +297,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: cff93442df490c44888fed6f38bcff99
     m_Address: GrassTop 15
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d1dc83688f4636949b8235f2201c6be0
+    m_Address: TurretTileBanaDer
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

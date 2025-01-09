@@ -1,16 +1,26 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public class WaveManager : Singleton<WaveManager>
 {
-    int _waveCount;
+    int _waveCount = 1;
     int _enemyCount;
+
+    public int EnemyCount
+    {
+        get => _enemyCount;
+        set => _enemyCount = value;
+    }
+
     [SerializeField] int BagaSinge;
     [SerializeField] int ArtiSinge;
     [SerializeField] int MastoSinge;
     [SerializeField] int ColosSinge;
+    [SerializeField] TextMeshProUGUI TimerText;
+    [SerializeField] TextMeshProUGUI WaveText;
 
     [SerializeField] List<GameObject> Monkeys = new List<GameObject>();
 
@@ -40,6 +50,7 @@ public class WaveManager : Singleton<WaveManager>
             }
         }
         StartCoroutine(WaitForSpawn());
+        WaveText.text = _waveCount.ToString();
     }
 
     void SpawnBagaSinge()
@@ -65,6 +76,7 @@ public class WaveManager : Singleton<WaveManager>
         {
             _waveCount++;
             _waveStarted = false;
+            BagaSinge += 5;
             StartCoroutine(WaitForSpawn());
         }
     }
@@ -74,11 +86,13 @@ public class WaveManager : Singleton<WaveManager>
         float waitTime = 30f;
         while (waitTime > 0)
         {
+            TimerText.text = waitTime.ToString();
             // Debug.Log("Time remaining: " + waitTime + " seconds");
             yield return new WaitForSeconds(1);
             waitTime -= 1;
         }
-        BagaSinge += 5;
+        TimerText.text = waitTime.ToString();
+        WaveText.text = _waveCount.ToString();
         SpawnBagaSinge();
     }
 }

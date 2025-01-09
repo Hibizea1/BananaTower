@@ -4,7 +4,7 @@ using UnityEngine;
 public class MoneyManager : Singleton<MoneyManager>
 {
     [SerializeField] TextMeshProUGUI MoneyText;
-    int _currentMoney = 100;
+    [SerializeField] int _currentMoney = 100;
 
     void Start()
     {

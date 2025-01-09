@@ -41,6 +41,7 @@ namespace Script.Controller.Save
         public void OnLoad()
         {
             var gameSave = FileHandler.ReadFromJSON<GameSave>(fileName);
+            Time.timeScale = 0;
             LoadTileMap(gameSave);
         }
 
@@ -106,6 +107,8 @@ namespace Script.Controller.Save
                     Debug.LogError("No parent tilemap found for turret at position " + turretSave.Position);
                 }
             }
+
+            Time.timeScale = 1;
         }
 
 
@@ -153,6 +156,12 @@ namespace Script.Controller.Save
                 ReloadTime = reloadTime;
                 Name = name;
             }
+        }
+        
+        [Serializable]
+        public class Waves
+        {
+            
         }
 
         [Serializable]

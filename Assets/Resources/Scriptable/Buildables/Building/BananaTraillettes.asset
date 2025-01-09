@@ -16,8 +16,11 @@ MonoBehaviour:
   uiCategory: {fileID: 11400000, guid: 499823653af7d0d49a720218e89252b6, type: 2}
   tileBase: {fileID: 11400000, guid: 421267b2e23d9c247a3f81692ecaf370, type: 2}
   placeType: 1
-  usePlacementRestriction: 0
-  placementRestriction: []
+  usePlacementRestriction: 1
+  placementRestriction:
+  - {fileID: 11400000, guid: 56794ddf5da15934d967c613fb99e3a6, type: 2}
+  - {fileID: 11400000, guid: 26edb15d8f72864438a164683eebffab, type: 2}
   isWall: 0
   isInvisible: 0
-  bananaCost: 50
+  bananaCost: 60
+  Picture: {fileID: 7661548298882717732, guid: 7acf295490691fd49ad6482ec9295865, type: 3}

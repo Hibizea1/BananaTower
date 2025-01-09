@@ -13,11 +13,12 @@ MonoBehaviour:
   m_Name: Eraser
   m_EditorClassIdentifier: 
   category: {fileID: 0}
-  uiCategory: {fileID: 0}
-  tileBase: {fileID: 0}
+  uiCategory: {fileID: 11400000, guid: ae9464fa368b6f04ab9c46340c570994, type: 2}
+  tileBase: {fileID: 11400000, guid: 9d039bac5301ce94b9170ea6d3b83a56, type: 2}
   placeType: 3
   usePlacementRestriction: 0
   placementRestriction: []
   isWall: 0
   isInvisible: 0
+  bananaCost: 0
   toolType: 1

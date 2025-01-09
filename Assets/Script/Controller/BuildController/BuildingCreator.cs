@@ -46,7 +46,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
     public Stack<Vector3Int> Path => _path;
 
     List<Vector3Int> _waterTiles = new List<Vector3Int>();
-    List<Vector3Int> _wallTiles = new List<Vector3Int>();
+    [SerializeField] List<Vector3Int> _wallTiles = new List<Vector3Int>();
     List<Vector3Int> _turretTiles = new List<Vector3Int>();
     BuildingObjectBase _selectedObj;
     Vector3Int _startPos, _goalPos;
@@ -116,13 +116,14 @@ public class BuildingCreator : Singleton<BuildingCreator>
         _eventMaster.CreateNewEvent("ReloadPath");
         _eventMaster.GetEvent("StartPath").AddListener(GetGoalAndStart);
         _eventMaster.GetEvent("ReloadPath").AddListener(Reset);
-        GetAllWallTiles();
+        // GetAllWallTiles();
+        PlaceWallLineWithRandomHole();
     }
 
 
     void GetAllWallTiles()
     {
-        _wallTiles.Clear(); // Clear the list before adding new tiles
+        _wallTiles.Clear();
 
         foreach (Tilemap tilemap in _mapsPathFinding)
         {
@@ -132,6 +133,22 @@ public class BuildingCreator : Singleton<BuildingCreator>
                 {
                     _wallTiles.Add(pos);
                 }
+            }
+        }
+    }
+
+    void PlaceWallLineWithRandomHole()
+    {
+        int lineLength = 9; // Length of the wall line
+        int randomHoleIndex = Random.Range(0, lineLength); // Random index for the hole
+
+        for (int i = -8; i < lineLength; i++)
+        {
+            if (i != randomHoleIndex)
+            {
+                Vector3Int position = new Vector3Int(-17, i, 0); // Adjust the position as needed
+                defaultMap.SetTile(position, wallTile);
+                _wallTiles.Add(position);
             }
         }
     }
@@ -163,6 +180,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
         _input.Player.MouseLeftClick.started += OnLeftClick;
         _input.Player.MouseLeftClick.canceled += OnLeftClick;
         _input.Player.MouseRightClick.performed += OnRightClick;
+        _input.Player.DebugModeGame.performed += DebugMod;
         // _input.Player.LoadPathDebug.performed += Reset;
         _input.Player.DebugMode.performed += ShowAndHideDebugMode;
     }
@@ -175,6 +193,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
         _input.Player.MouseRightClick.performed -= OnRightClick;
         _input.Player.MouseLeftClick.started -= OnLeftClick;
         _input.Player.MouseLeftClick.canceled -= OnLeftClick;
+        _input.Player.DebugModeGame.canceled -= DebugMod;
         // _input.Player.LoadPathDebug.performed -= Reset;
         _input.Player.DebugMode.performed += ShowAndHideDebugMode;
         // _pathFinding.RemoveListener(Algorithm);
@@ -232,7 +251,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
 
         AStarDebug.Instance.CreateTiles(_openNodes, _closedNodes, _allNodes, _startPos, _goalPos, _path);
     }
-    
+
     void Initialize()
     {
         _current = GetNode(_startPos);
@@ -448,14 +467,26 @@ public class BuildingCreator : Singleton<BuildingCreator>
             return;
         }
 
+
         SelectedObj = obj;
-        var selected = (AStarTile)_selectedObj.Tile;
-        _tileType = selected.Type;
+        if (_selectedObj.IsWall)
+        {
+            var selected = (AStarTileRule)_selectedObj.Tile;
+            _tileType = selected.Type;
+        }
+        else
+        {
+            var selected = (AStarTile)_selectedObj.Tile;
+            _tileType = selected.Type;
+        }
+
 
         EnableGridVisual(true);
     }
 
     #endregion
+
+    #region DrawItem
 
     void GetGoalAndStart()
     {
@@ -649,14 +680,14 @@ public class BuildingCreator : Singleton<BuildingCreator>
             }
             else
             {
-                var tile = (AStarTile)_tileBase;
+                var tile = (AStarTileRule)_tileBase;
                 TileBase newTileBase = tile;
                 _wallTiles.Add(position);
                 map.SetTile(position, newTileBase);
             }
+            _eventMaster.InvokeEventInt("RemoveMoney", _selectedObj.BananaCost);
         }
 
-        _eventMaster.InvokeEventInt("RemoveMoney", _selectedObj.BananaCost);
         _eventMaster.InvokeEvent("ReloadPath");
     }
 
@@ -674,6 +705,19 @@ public class BuildingCreator : Singleton<BuildingCreator>
             CellSize, new Vector4(cellSize, cellSize, 0, 0));
     }
 
+    #endregion
+
+    #region DebugMode
+
+    public void DebugMod(InputAction.CallbackContext ctx)
+    {
+        EventMaster.GetInstance().InvokeEvent("DebugMode");
+    }
+
+    #endregion
+    
+    
+    
     public void Reset()
     {
         AStarDebug.Instance.Reset();

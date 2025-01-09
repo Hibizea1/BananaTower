@@ -12,6 +12,9 @@ public class BagaSinge : MonkeyBase
     void Start()
     {
         InitializePath();
+        _currentHealth = _health;
+        HealthSlider.maxValue = _health;
+        HealthSlider.value = _currentHealth;
     }
 
     void Update()
@@ -25,6 +28,8 @@ public class BagaSinge : MonkeyBase
         {
             Move();
         }
+
+        HealthSlider.value = _currentHealth;
     }
 
     void InitializePath()

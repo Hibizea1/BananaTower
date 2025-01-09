@@ -21,9 +21,21 @@ public class BuildingHUD : Singleton<BuildingHUD>
 
     readonly Dictionary<UiCategory, GameObject> _uiElement = new Dictionary<UiCategory, GameObject>();
 
+    protected override void Awake()
+    {
+        base.Awake();
+        EventMaster.GetInstance().CreateNewEvent("DebugMode");
+        EventMaster.GetInstance().GetEvent("DebugMode").AddListener(DebugMode);
+    }
+
     void Start()
     {
         BuildUI();
+    }
+
+    void DebugMode()
+    {
+        _uiElement[categories[1]].SetActive(!_uiElement[categories[1]].activeSelf);
     }
 
     void BuildUI()
@@ -92,17 +104,40 @@ public class BuildingHUD : Singleton<BuildingHUD>
             }
             else
             {
-                Transform itemsParent = _elementItemSlot[_uiElement[b.UiCategory]];
-                GameObject inst = Instantiate(itemPrefab, Vector3.zero, Quaternion.identity);
-                inst.transform.SetParent(itemsParent, false);
-                Image img = inst.GetComponent<Image>();
-                Tile t = (Tile)b.Tile;
-                img.sprite = t.sprite;
-                BuildingBoutonHandler script = inst.GetComponent<BuildingBoutonHandler>();
-                script.Item = b;
-                script.Panel = buildingButtonPanel.GetComponent<SetBuildingPanel>();
+                
+                
+                if (b.IsWall)
+                {                
+                    var itemsParent = _elementItemSlot[_uiElement[b.UiCategory]];
+                    var inst = Instantiate(itemPrefab, Vector3.zero, Quaternion.identity);
+                    inst.transform.SetParent(itemsParent, false);
+                    inst.AddComponent<TileButton>();
+                    var t = (RuleTile)b.Tile;
+                    var img = inst.GetComponent<Image>();
+                    img.sprite = t.m_DefaultSprite;
+                    var script = inst.GetComponent<BuildingBoutonHandler>();
+                    script.Item = b;
+                    script.Panel = buildingButtonPanel.GetComponent<SetBuildingPanel>();
+                    var btn = inst.GetComponent<TileButton>();
+                    btn.TileType = ((AStarTileRule)script.Item.Tile).Type;
+                }
+                else
+                {
+                    Transform itemsParent = _elementItemSlot[_uiElement[b.UiCategory]];
+                    GameObject inst = Instantiate(itemPrefab, Vector3.zero, Quaternion.identity);
+                    inst.transform.SetParent(itemsParent, false);
+                    Image img = inst.GetComponent<Image>();
+                    Tile t = (Tile)b.Tile;
+                    img.sprite = t.sprite;
+                    BuildingBoutonHandler script = inst.GetComponent<BuildingBoutonHandler>();
+                    script.Item = b;
+                    script.Panel = buildingButtonPanel.GetComponent<SetBuildingPanel>();
+                }
+                
             }
         }
+        _uiElement[categories[1]].SetActive(!_uiElement[categories[1]].activeSelf);
+
     }
 
     BuildingObjectBase[] GetAllBuildables()

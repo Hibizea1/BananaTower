@@ -152,6 +152,24 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""DebugModeGame"",
+                    ""type"": ""Button"",
+                    ""id"": ""e75974d3-409e-4a8d-a4c2-8bc8638786bf"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""DebugModeIncreaseMoney"",
+                    ""type"": ""Button"",
+                    ""id"": ""c48de4a4-022e-4678-8264-3b7291ef1db2"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -614,6 +632,72 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""DebugMode"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""One Modifier"",
+                    ""id"": ""a1315aba-a880-4082-b3af-115690e8037b"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DebugModeGame"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""modifier"",
+                    ""id"": ""65dad164-61c9-4e3a-9d56-acda6db5ce01"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DebugModeGame"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""7855dfbe-6f0d-4834-8f09-afd4b573d8f6"",
+                    ""path"": ""<Keyboard>/k"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DebugModeGame"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""One Modifier"",
+                    ""id"": ""9c440dc1-82f0-4758-9088-dceabac37ed7"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DebugModeIncreaseMoney"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""modifier"",
+                    ""id"": ""677698e8-8033-40a6-9a53-6a96ff1728db"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DebugModeIncreaseMoney"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""0ba0c0d1-dd02-4173-87f4-9eb5c0db6da2"",
+                    ""path"": ""<Keyboard>/i"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DebugModeIncreaseMoney"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 }
@@ -1215,6 +1299,8 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         m_Player_MousePosition = m_Player.FindAction("MousePosition", throwIfNotFound: true);
         m_Player_LoadPathDebug = m_Player.FindAction("LoadPathDebug", throwIfNotFound: true);
         m_Player_DebugMode = m_Player.FindAction("DebugMode", throwIfNotFound: true);
+        m_Player_DebugModeGame = m_Player.FindAction("DebugModeGame", throwIfNotFound: true);
+        m_Player_DebugModeIncreaseMoney = m_Player.FindAction("DebugModeIncreaseMoney", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1308,6 +1394,8 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_MousePosition;
     private readonly InputAction m_Player_LoadPathDebug;
     private readonly InputAction m_Player_DebugMode;
+    private readonly InputAction m_Player_DebugModeGame;
+    private readonly InputAction m_Player_DebugModeIncreaseMoney;
     public struct PlayerActions
     {
         private @PlayerInput m_Wrapper;
@@ -1326,6 +1414,8 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         public InputAction @MousePosition => m_Wrapper.m_Player_MousePosition;
         public InputAction @LoadPathDebug => m_Wrapper.m_Player_LoadPathDebug;
         public InputAction @DebugMode => m_Wrapper.m_Player_DebugMode;
+        public InputAction @DebugModeGame => m_Wrapper.m_Player_DebugModeGame;
+        public InputAction @DebugModeIncreaseMoney => m_Wrapper.m_Player_DebugModeIncreaseMoney;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1377,6 +1467,12 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @DebugMode.started += instance.OnDebugMode;
             @DebugMode.performed += instance.OnDebugMode;
             @DebugMode.canceled += instance.OnDebugMode;
+            @DebugModeGame.started += instance.OnDebugModeGame;
+            @DebugModeGame.performed += instance.OnDebugModeGame;
+            @DebugModeGame.canceled += instance.OnDebugModeGame;
+            @DebugModeIncreaseMoney.started += instance.OnDebugModeIncreaseMoney;
+            @DebugModeIncreaseMoney.performed += instance.OnDebugModeIncreaseMoney;
+            @DebugModeIncreaseMoney.canceled += instance.OnDebugModeIncreaseMoney;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -1423,6 +1519,12 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @DebugMode.started -= instance.OnDebugMode;
             @DebugMode.performed -= instance.OnDebugMode;
             @DebugMode.canceled -= instance.OnDebugMode;
+            @DebugModeGame.started -= instance.OnDebugModeGame;
+            @DebugModeGame.performed -= instance.OnDebugModeGame;
+            @DebugModeGame.canceled -= instance.OnDebugModeGame;
+            @DebugModeIncreaseMoney.started -= instance.OnDebugModeIncreaseMoney;
+            @DebugModeIncreaseMoney.performed -= instance.OnDebugModeIncreaseMoney;
+            @DebugModeIncreaseMoney.canceled -= instance.OnDebugModeIncreaseMoney;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -1619,6 +1721,8 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         void OnMousePosition(InputAction.CallbackContext context);
         void OnLoadPathDebug(InputAction.CallbackContext context);
         void OnDebugMode(InputAction.CallbackContext context);
+        void OnDebugModeGame(InputAction.CallbackContext context);
+        void OnDebugModeIncreaseMoney(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {
