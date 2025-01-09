@@ -141,9 +141,9 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "DebugModeIncreaseMoney",
+                    "name": "AddMoney",
                     "type": "Button",
-                    "id": "c48de4a4-022e-4678-8264-3b7291ef1db2",
+                    "id": "5e88a2b5-034d-4a90-96af-fa8d113fde0b",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -648,34 +648,34 @@
                 },
                 {
                     "name": "One Modifier",
-                    "id": "9c440dc1-82f0-4758-9088-dceabac37ed7",
+                    "id": "f39ebd33-25f7-42fb-815c-c32305f10c14",
                     "path": "OneModifier",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "DebugModeIncreaseMoney",
+                    "action": "AddMoney",
                     "isComposite": true,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "modifier",
-                    "id": "677698e8-8033-40a6-9a53-6a96ff1728db",
-                    "path": "<Keyboard>/shift",
+                    "id": "43891f9b-2a73-423f-b387-c20dd3ae50cd",
+                    "path": "<Keyboard>/ctrl",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "DebugModeIncreaseMoney",
+                    "action": "AddMoney",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
                 {
                     "name": "binding",
-                    "id": "0ba0c0d1-dd02-4173-87f4-9eb5c0db6da2",
-                    "path": "<Keyboard>/i",
+                    "id": "859f56ef-81a8-4f11-bb33-1b03f8429333",
+                    "path": "<Keyboard>/v",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "DebugModeIncreaseMoney",
+                    "action": "AddMoney",
                     "isComposite": false,
                     "isPartOfComposite": true
                 }

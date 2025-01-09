@@ -163,9 +163,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""DebugModeIncreaseMoney"",
+                    ""name"": ""AddMoney"",
                     ""type"": ""Button"",
-                    ""id"": ""c48de4a4-022e-4678-8264-3b7291ef1db2"",
+                    ""id"": ""5e88a2b5-034d-4a90-96af-fa8d113fde0b"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -670,34 +670,34 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": ""One Modifier"",
-                    ""id"": ""9c440dc1-82f0-4758-9088-dceabac37ed7"",
+                    ""id"": ""f39ebd33-25f7-42fb-815c-c32305f10c14"",
                     ""path"": ""OneModifier"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""DebugModeIncreaseMoney"",
+                    ""action"": ""AddMoney"",
                     ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": ""modifier"",
-                    ""id"": ""677698e8-8033-40a6-9a53-6a96ff1728db"",
-                    ""path"": ""<Keyboard>/shift"",
+                    ""id"": ""43891f9b-2a73-423f-b387-c20dd3ae50cd"",
+                    ""path"": ""<Keyboard>/ctrl"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""DebugModeIncreaseMoney"",
+                    ""action"": ""AddMoney"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
                 {
                     ""name"": ""binding"",
-                    ""id"": ""0ba0c0d1-dd02-4173-87f4-9eb5c0db6da2"",
-                    ""path"": ""<Keyboard>/i"",
+                    ""id"": ""859f56ef-81a8-4f11-bb33-1b03f8429333"",
+                    ""path"": ""<Keyboard>/v"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""DebugModeIncreaseMoney"",
+                    ""action"": ""AddMoney"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 }
@@ -1300,7 +1300,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         m_Player_LoadPathDebug = m_Player.FindAction("LoadPathDebug", throwIfNotFound: true);
         m_Player_DebugMode = m_Player.FindAction("DebugMode", throwIfNotFound: true);
         m_Player_DebugModeGame = m_Player.FindAction("DebugModeGame", throwIfNotFound: true);
-        m_Player_DebugModeIncreaseMoney = m_Player.FindAction("DebugModeIncreaseMoney", throwIfNotFound: true);
+        m_Player_AddMoney = m_Player.FindAction("AddMoney", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1395,7 +1395,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_LoadPathDebug;
     private readonly InputAction m_Player_DebugMode;
     private readonly InputAction m_Player_DebugModeGame;
-    private readonly InputAction m_Player_DebugModeIncreaseMoney;
+    private readonly InputAction m_Player_AddMoney;
     public struct PlayerActions
     {
         private @PlayerInput m_Wrapper;
@@ -1415,7 +1415,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         public InputAction @LoadPathDebug => m_Wrapper.m_Player_LoadPathDebug;
         public InputAction @DebugMode => m_Wrapper.m_Player_DebugMode;
         public InputAction @DebugModeGame => m_Wrapper.m_Player_DebugModeGame;
-        public InputAction @DebugModeIncreaseMoney => m_Wrapper.m_Player_DebugModeIncreaseMoney;
+        public InputAction @AddMoney => m_Wrapper.m_Player_AddMoney;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1470,9 +1470,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @DebugModeGame.started += instance.OnDebugModeGame;
             @DebugModeGame.performed += instance.OnDebugModeGame;
             @DebugModeGame.canceled += instance.OnDebugModeGame;
-            @DebugModeIncreaseMoney.started += instance.OnDebugModeIncreaseMoney;
-            @DebugModeIncreaseMoney.performed += instance.OnDebugModeIncreaseMoney;
-            @DebugModeIncreaseMoney.canceled += instance.OnDebugModeIncreaseMoney;
+            @AddMoney.started += instance.OnAddMoney;
+            @AddMoney.performed += instance.OnAddMoney;
+            @AddMoney.canceled += instance.OnAddMoney;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -1522,9 +1522,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @DebugModeGame.started -= instance.OnDebugModeGame;
             @DebugModeGame.performed -= instance.OnDebugModeGame;
             @DebugModeGame.canceled -= instance.OnDebugModeGame;
-            @DebugModeIncreaseMoney.started -= instance.OnDebugModeIncreaseMoney;
-            @DebugModeIncreaseMoney.performed -= instance.OnDebugModeIncreaseMoney;
-            @DebugModeIncreaseMoney.canceled -= instance.OnDebugModeIncreaseMoney;
+            @AddMoney.started -= instance.OnAddMoney;
+            @AddMoney.performed -= instance.OnAddMoney;
+            @AddMoney.canceled -= instance.OnAddMoney;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -1722,7 +1722,7 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         void OnLoadPathDebug(InputAction.CallbackContext context);
         void OnDebugMode(InputAction.CallbackContext context);
         void OnDebugModeGame(InputAction.CallbackContext context);
-        void OnDebugModeIncreaseMoney(InputAction.CallbackContext context);
+        void OnAddMoney(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {

@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -15,16 +14,16 @@ public class Debugger : MonoBehaviour
 
     void OnEnable()
     {
-        _input.Player.DebugModeIncreaseMoney.performed += SetCoin;
+        _input.Player.AddMoney.performed += SetCoin;
     }
 
     void OnDisable()
     {
-        _input.Player.DebugModeIncreaseMoney.canceled -= SetCoin;
+        _input.Player.AddMoney.canceled -= SetCoin;
     }
 
     public void SetCoin(InputAction.CallbackContext ctx)
     {
-        EventMaster.GetInstance().InvokeEventInt("AddMoney", 100000);
+        EventMaster.GetInstance().InvokeEventInt("AddMoney", 1000);
     }
 }

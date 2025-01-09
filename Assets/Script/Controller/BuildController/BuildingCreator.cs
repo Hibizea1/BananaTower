@@ -169,6 +169,10 @@ public class BuildingCreator : Singleton<BuildingCreator>
 
                 if (_holdActive) HandleDrawing();
             }
+
+            Tile turretTile = (Tile)_selectedObj.Tile;
+            GameObject turretGameObject = turretTile.gameObject;
+            turretGameObject.gameObject.GetComponent<Turret>().enabled = false;
         }
     }
 
@@ -181,6 +185,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
         _input.Player.MouseLeftClick.canceled += OnLeftClick;
         _input.Player.MouseRightClick.performed += OnRightClick;
         _input.Player.DebugModeGame.performed += DebugMod;
+        _input.Player.AddMoney.performed += SetCoin;
         // _input.Player.LoadPathDebug.performed += Reset;
         _input.Player.DebugMode.performed += ShowAndHideDebugMode;
     }
@@ -194,6 +199,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
         _input.Player.MouseLeftClick.started -= OnLeftClick;
         _input.Player.MouseLeftClick.canceled -= OnLeftClick;
         _input.Player.DebugModeGame.canceled -= DebugMod;
+        _input.Player.AddMoney.canceled -= SetCoin;
         // _input.Player.LoadPathDebug.performed -= Reset;
         _input.Player.DebugMode.performed += ShowAndHideDebugMode;
         // _pathFinding.RemoveListener(Algorithm);
@@ -269,22 +275,27 @@ public class BuildingCreator : Singleton<BuildingCreator>
     {
         List<Node> neighbors = new List<Node>();
 
-        for (var x = -1; x <= 1; x++)
-        for (var y = -1; y <= 1; y++)
+        Vector3Int[] directions = new Vector3Int[]
         {
-            var neighborPos = new Vector3Int(parentPosition.x - x, parentPosition.y - y, parentPosition.z);
-            if (y != 0 || x != 0)
-                if (neighborPos != _startPos && TilemapForPath(neighborPos) && !_wallTiles.Contains(neighborPos) &&
-                    !_turretTiles.Contains(neighborPos))
-                {
-                    var neighbor = GetNode(neighborPos);
-                    neighbors.Add(neighbor);
-                }
+            new Vector3Int(1, 0, 0), // Right
+            new Vector3Int(-1, 0, 0), // Left
+            new Vector3Int(0, 1, 0), // Up
+            new Vector3Int(0, -1, 0) // Down
+        };
+
+        foreach (var direction in directions)
+        {
+            var neighborPos = parentPosition + direction;
+            if (neighborPos != _startPos && TilemapForPath(neighborPos) && !_wallTiles.Contains(neighborPos) &&
+                !_turretTiles.Contains(neighborPos))
+            {
+                var neighbor = GetNode(neighborPos);
+                neighbors.Add(neighbor);
+            }
         }
 
         return neighbors;
     }
-
 
     TileBase TilemapForPath(Vector3Int pos)
     {
@@ -523,7 +534,10 @@ public class BuildingCreator : Singleton<BuildingCreator>
     {
         previewMap.SetTile(_lastGridPosition, null);
 
-        if (!IsForbidden(_currentGridPosition)) previewMap.SetTile(_currentGridPosition, _tileBase);
+        if (!IsForbidden(_currentGridPosition))
+        {
+            previewMap.SetTile(_currentGridPosition, _tileBase);
+        }
 
     }
 
@@ -673,6 +687,8 @@ public class BuildingCreator : Singleton<BuildingCreator>
                     tile.gameObject.name = "Turret " + _index;
                     _index++;
                     _turretTiles.Add(position);
+                    tile.gameObject.GetComponent<Turret>().enabled = true;
+                    BuildingHUD.GetInstance().Turrets1.Add(tile.gameObject.GetComponent<Turret>());
                 }
 
                 TileBase newTileBase = tile;
@@ -685,6 +701,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
                 _wallTiles.Add(position);
                 map.SetTile(position, newTileBase);
             }
+
             _eventMaster.InvokeEventInt("RemoveMoney", _selectedObj.BananaCost);
         }
 
@@ -714,10 +731,14 @@ public class BuildingCreator : Singleton<BuildingCreator>
         EventMaster.GetInstance().InvokeEvent("DebugMode");
     }
 
+    public void SetCoin(InputAction.CallbackContext ctx)
+    {
+        EventMaster.GetInstance().InvokeEventInt("AddMoney", 1000);
+    }
+
     #endregion
-    
-    
-    
+
+
     public void Reset()
     {
         AStarDebug.Instance.Reset();

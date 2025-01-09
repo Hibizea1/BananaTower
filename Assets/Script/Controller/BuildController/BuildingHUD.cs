@@ -1,6 +1,8 @@
 #region
 
+using System;
 using System.Collections.Generic;
+using NUnit.Framework;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -16,6 +18,15 @@ public class BuildingHUD : Singleton<BuildingHUD>
     [SerializeField] GameObject itemPrefab;
     [SerializeField] GameObject buildingButtonPanel;
     [SerializeField] bool debugAll;
+    [SerializeField] Button BanaDerButton;
+    [SerializeField] List<Turret> Turrets = new List<Turret>();
+
+    public List<Turret> Turrets1
+    {
+        get => Turrets;
+        set => Turrets = value;
+    }
+
     readonly Dictionary<GameObject, Transform> _elementItemSlot = new Dictionary<GameObject, Transform>();
 
 
@@ -26,8 +37,22 @@ public class BuildingHUD : Singleton<BuildingHUD>
         base.Awake();
         EventMaster.GetInstance().CreateNewEvent("DebugMode");
         EventMaster.GetInstance().GetEvent("DebugMode").AddListener(DebugMode);
+        EventMaster.GetInstance().CreateNewEvent("ActiveBanaDer");
     }
 
+    void Update()
+    {
+        if (Turrets.Count > 0)
+        {
+            BanaDerButton.interactable = true;
+        }
+    }
+
+    public void ActiveBanaDer()
+    {
+        EventMaster.GetInstance().InvokeEvent("ActiveBanaDer");
+    }
+    
     void Start()
     {
         BuildUI();

@@ -1,25 +1,26 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(CircleCollider2D))]
 public abstract class Turret : MonoBehaviour
 {
-    [SerializeField] private int _damage;
-    [SerializeField] private int _range;
+    [SerializeField] protected int _damage;
+    [SerializeField] protected int _range;
+    [SerializeField] protected Slider ReloadSlider;
 
-    [FormerlySerializedAs("_timeToShoot")] [SerializeField]
-    private float _timeToTimeToShoot;
+    [SerializeField] protected float _timeToTimeToShoot;
 
-    [SerializeField] private int _magazineSize;
-    [SerializeField] private float _reloadTime;
+    [SerializeField] protected int _magazineSize;
+    [SerializeField] protected float _reloadTime;
 
     #region PropertySettings
 
     public int Damage
     {
         get => _damage;
-        protected set => _damage = value;
+        set => _damage = value;
     }
 
     public int Range
@@ -49,18 +50,18 @@ public abstract class Turret : MonoBehaviour
     #endregion
 
 
-    private int _currentMagazine;
+    protected int _currentMagazine;
 
-    private float _reloadTimer;
-    private float _shootTimer;
+    protected float _reloadTimer;
+    protected float _shootTimer;
 
-    private CircleCollider2D _detectionCollider;
+    protected CircleCollider2D _detectionCollider;
 
-    [SerializeField] private List<MonkeyBase> _enemiesInRange;
+    [SerializeField] protected List<MonkeyBase> _enemiesInRange;
 
     public List<MonkeyBase> EnemiesInRange { get; protected set; }
 
-    private void Start()
+    protected virtual void Start()
     {
         _enemiesInRange = new List<MonkeyBase>();
         _detectionCollider = GetComponent<CircleCollider2D>();
@@ -70,11 +71,13 @@ public abstract class Turret : MonoBehaviour
         _shootTimer = 0;
 
         _detectionCollider.radius = _range;
-        transform.GetChild(0).localScale = new Vector3(_range*2, _range*2, 1);
+        transform.GetChild(0).localScale = new Vector3(_range * 2, _range * 2, 1);
     }
 
     void Update()
     {
+
+        
         CheckOnReload();
 
         CheckOnShoot();
@@ -90,13 +93,7 @@ public abstract class Turret : MonoBehaviour
         name = loadName;
     }
 
-    protected virtual void Shoot()
-    {
-        _enemiesInRange[0].TakeDamage(_damage);
-        EventMaster.GetInstance().InvokeEvent("CheckCount");
-        //TODO : Instantiate projectile maybe deal damage with projectile
-        Debug.Log("Bang");
-    }
+    protected abstract void Shoot();
     public abstract void Upgrade();
 
     protected virtual void Reload()
@@ -118,19 +115,8 @@ public abstract class Turret : MonoBehaviour
         }
     }
 
-    private void CheckOnShoot()
-    {
-        if (_enemiesInRange.Count > 0 && _currentMagazine > 0)
-        {
-            _shootTimer += Time.deltaTime;
-            if (_shootTimer >= TimeToShoot)
-            {
-                Shoot();
-                _shootTimer = 0.0f;
-            }
-        }
-    }
-
+    protected abstract void CheckOnShoot();
+    
 
     private void OnTriggerEnter2D(Collider2D other)
     {

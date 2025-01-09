@@ -27,6 +27,13 @@ public class BuildingObjectBase : ScriptableObject
     [SerializeField] bool isInvisible;
     [SerializeField] int bananaCost;
     [SerializeField] Sprite Picture;
+    bool _isInPreview;
+
+    public bool IsInPreview
+    {
+        get => _isInPreview;
+        set => _isInPreview = value;
+    }
 
     public Sprite Picture1 => Picture;
 
