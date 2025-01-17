@@ -69,6 +69,7 @@ public abstract class MonkeyBase : MonoBehaviour
     {
         //TODO : monkey death
         WaveManager.GetInstance().EnemyCount--;
+        EventMaster.GetInstance().InvokeEvent("CheckCount");
         Destroy(gameObject);
     }
 

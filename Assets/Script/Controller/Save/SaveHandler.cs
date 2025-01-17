@@ -2,9 +2,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 
 #endregion
@@ -16,9 +20,11 @@ namespace Script.Controller.Save
         [SerializeField] BoundsInt bounds;
         [SerializeField] string fileName = "SaveBananaDefense.JSON";
         readonly Dictionary<string, Tilemap> _tilemaps = new Dictionary<string, Tilemap>();
+        string _saveFilePath;
 
         void Start()
         {
+            _saveFilePath = FileHandler.GetPath(fileName);
             InitTilemap();
         }
 
@@ -33,20 +39,79 @@ namespace Script.Controller.Save
         {
             var gameSave = new GameSave(
                 SaveTurrets(),
-                SaveTilemaps()
+                SaveTilemaps(),
+                SaveWaves(),
+                SaveDataPath(),
+                SaveMoney()
             );
             FileHandler.SaveToJSON(gameSave, fileName);
+            SceneManager.LoadScene(0);
+
+        }
+
+
+        public bool HasSave()
+        {
+            return File.Exists(_saveFilePath);
+        }
+
+        void OnSceneLoaded(Scene arg0, LoadSceneMode arg1)
+        {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            var gameSave = FileHandler.ReadFromJSON<GameSave>(fileName);
+            LoadMoney(gameSave);
         }
 
         public void OnLoad()
         {
-            var gameSave = FileHandler.ReadFromJSON<GameSave>(fileName);
             Time.timeScale = 0;
+            SceneManager.sceneLoaded += OnSceneLoaded;
+            SceneManager.LoadScene(1);
+            var gameSave = FileHandler.ReadFromJSON<GameSave>(fileName);
             LoadTileMap(gameSave);
+        }
+
+        void LoadWaves(GameSave gameSave)
+        {
+            Debug.Log("Loading Waves");
+            var waveManager = WaveManager.GetInstance();
+            waveManager.LoadData(
+                gameSave.WavesData.WaveCount,
+                gameSave.WavesData.BagaSinge,
+                gameSave.WavesData.ArtiSinge,
+                gameSave.WavesData.MastoSinge,
+                gameSave.WavesData.ColosSinge
+            );
+            Debug.Log("Loading End Waves");
+            Debug.Log("Loading Ends");
+            Time.timeScale = 1;
+        }
+
+        void LoadMoney(GameSave gameSave)
+        {
+            Debug.Log("Loading Money");
+            var moneyManager = MoneyManager.GetInstance();
+            moneyManager.LoadData(
+                gameSave.MoneyManagerSaveData.Money
+            );
+            Debug.Log("Loading End Money");
+            LoadDataPath(gameSave);
+        }
+
+        void LoadDataPath(GameSave gameSave)
+        {
+            Debug.Log("Loading Path");
+            BuildingCreator.GetInstance().LoadData(
+                gameSave.DataPaths.WallTiles,
+                gameSave.DataPaths.WaterTiles,
+                gameSave.DataPaths.TurretTiles);
+            Debug.Log("Loading End Path");
+            LoadWaves(gameSave);
         }
 
         async Task LoadTileMap(GameSave gameSave)
         {
+            Debug.Log("Loading TileMaps");
             foreach (var mapData in gameSave.Tilemaps)
             {
                 if (!_tilemaps.ContainsKey(mapData.Key))
@@ -67,6 +132,7 @@ namespace Script.Controller.Save
                     }
             }
 
+            Debug.Log("Loading End TileMaps");
             LoadTurrets(gameSave);
         }
 
@@ -77,6 +143,7 @@ namespace Script.Controller.Save
 
         void LoadTurrets(GameSave gameSave)
         {
+            Debug.Log("Loading Turret");
             foreach (var turretSave in gameSave.Turrets)
             {
                 // Find the parent tilemap based on the turret's cell position
@@ -108,7 +175,7 @@ namespace Script.Controller.Save
                 }
             }
 
-            Time.timeScale = 1;
+            Debug.Log("Loading End Turret");
         }
 
 
@@ -117,6 +184,17 @@ namespace Script.Controller.Save
         {
             public string Key;
             public List<TileInfo> Tiles = new List<TileInfo>();
+        }
+
+        [Serializable]
+        public class MoneyManagerSave
+        {
+            public int Money;
+
+            public MoneyManagerSave(int money)
+            {
+                Money = money;
+            }
         }
 
         [Serializable]
@@ -140,12 +218,12 @@ namespace Script.Controller.Save
             public Vector3 Position;
             public string Name;
             public int Damage;
-            public int Range;
+            public float Range;
             public float ShootRate;
             public int MagazineSize;
             public float ReloadTime;
 
-            public TurretSave(Vector3 position, int damage, int range, float shootRate, int magazineSize,
+            public TurretSave(Vector3 position, int damage, float range, float shootRate, int magazineSize,
                 float reloadTime, string name)
             {
                 Position = position;
@@ -157,11 +235,39 @@ namespace Script.Controller.Save
                 Name = name;
             }
         }
-        
+
+        [Serializable]
+        public class DataPath
+        {
+            public List<Vector3Int> WallTiles;
+            public List<Vector3Int> WaterTiles;
+            public List<Vector3Int> TurretTiles;
+
+            public DataPath(List<Vector3Int> wallTiles, List<Vector3Int> waterTiles, List<Vector3Int> turretTiles)
+            {
+                WallTiles = wallTiles;
+                WaterTiles = waterTiles;
+                TurretTiles = turretTiles;
+            }
+        }
+
         [Serializable]
         public class Waves
         {
-            
+            public int WaveCount;
+            public int BagaSinge;
+            public int ArtiSinge;
+            public int MastoSinge;
+            public int ColosSinge;
+
+            public Waves(int waveCount, int bagaSinge, int artiSinge, int mastoSinge, int colosSinge)
+            {
+                WaveCount = waveCount;
+                BagaSinge = bagaSinge;
+                ArtiSinge = artiSinge;
+                MastoSinge = mastoSinge;
+                ColosSinge = colosSinge;
+            }
         }
 
         [Serializable]
@@ -169,11 +275,18 @@ namespace Script.Controller.Save
         {
             public List<TurretSave> Turrets;
             public List<TilemapData> Tilemaps;
+            public Waves WavesData;
+            public DataPath DataPaths;
+            public MoneyManagerSave MoneyManagerSaveData;
 
-            public GameSave(List<TurretSave> turrets, List<TilemapData> tilemaps)
+            public GameSave(List<TurretSave> turrets, List<TilemapData> tilemaps, Waves waves, DataPath dataPath,
+                MoneyManagerSave money)
             {
                 Turrets = turrets;
                 Tilemaps = tilemaps;
+                WavesData = waves;
+                DataPaths = dataPath;
+                MoneyManagerSaveData = money;
             }
         }
 
@@ -239,6 +352,37 @@ namespace Script.Controller.Save
             }
 
             return data;
+        }
+
+        Waves SaveWaves()
+        {
+            var waveManager = WaveManager.GetInstance();
+            return new Waves(
+                waveManager.WaveCount,
+                waveManager.BagaSinge1,
+                waveManager.ArtiSinge1,
+                waveManager.MastoSinge1,
+                waveManager.ColosSinge1
+            );
+        }
+
+        DataPath SaveDataPath()
+        {
+            var buildingCreator = BuildingCreator.GetInstance();
+            return new DataPath(
+                buildingCreator.WallTiles,
+                buildingCreator.WaterTiles,
+                buildingCreator.TurretTiles
+                );
+        }
+
+
+        MoneyManagerSave SaveMoney()
+        {
+            var moneyManager = MoneyManager.GetInstance();
+            return new MoneyManagerSave(
+                moneyManager.GetMoneyCount()
+            );
         }
 
         #endregion

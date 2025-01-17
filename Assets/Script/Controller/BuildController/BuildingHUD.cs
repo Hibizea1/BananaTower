@@ -129,8 +129,6 @@ public class BuildingHUD : Singleton<BuildingHUD>
             }
             else
             {
-                
-                
                 if (b.IsWall)
                 {                
                     var itemsParent = _elementItemSlot[_uiElement[b.UiCategory]];

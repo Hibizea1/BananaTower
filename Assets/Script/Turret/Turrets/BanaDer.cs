@@ -16,6 +16,7 @@ public class BanaDer : Turret
     protected override void Start()
     {
         ParticleSystem.Stop();
+        ReloadSlider.maxValue = _reloadTime;
         EventMaster.GetInstance().GetEvent("ActiveBanaDer").AddListener(StartBuff);
     }
 
@@ -36,7 +37,26 @@ public class BanaDer : Turret
 
     public override void Upgrade()
     {
-        throw new System.NotImplementedException();
+        if (MoneyManager.GetInstance().CheckMoneyCount(UpgradeCost))
+        {
+            LevelCount++;
+            _range += IncresedRangePerUpgrade;
+            IncreasePower += 5;
+            _reloadTime -= DecreseReloadTimePerUpgrade;
+            if (_reloadTime <= 1)
+            {
+                _reloadTime = 1;
+            }
+            EventMaster.GetInstance().InvokeEventInt("RemoveMoney", UpgradeCost);
+            UpgradeCost *= 2;
+            float redValue = Mathf.Clamp01(LevelCount * 0.1f);
+            _spriteRenderer.color = new Color(1f, 1f - redValue, 1f - redValue);
+        }
+        else
+        {
+            TextScroller.GetInstance().LaunchTextScroll();
+        }
+
     }
 
     protected override void CheckOnShoot()
@@ -45,11 +65,12 @@ public class BanaDer : Turret
 
     public void StartBuff()
     {
-        if (!_isActive)
+        if (!_isActive && _currentMagazine >= 0)
         {
             _isActive = true;
             StartCoroutine(ShootAndReload());
             ParticleSystem.Play();
+            _currentMagazine--;
         }
     }
 
@@ -65,7 +86,6 @@ public class BanaDer : Turret
 
         // Reload for the duration of reloadTime
         ReloadSlider.gameObject.SetActive(true);
-        ReloadSlider.maxValue = _reloadTime;
         ReloadSlider.value = 0;
 
         while (ReloadSlider.value < _reloadTime)
@@ -94,5 +114,7 @@ public class BanaDer : Turret
                 _nerf = true;
             }
         }
+
+        _currentMagazine = 1;
     }
 }

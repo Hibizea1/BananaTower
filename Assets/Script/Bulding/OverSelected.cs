@@ -5,12 +5,15 @@ public class OverSelected : MonoBehaviour
     Camera _camera;
     SpriteRenderer _img;
     Collider2D[] _hitColliders;
+    Turret _turret;
 
     void Start()
     {
         _camera = Camera.main;
         _img = transform.GetChild(0).GetComponent<SpriteRenderer>();
         _img.enabled = false;
+        _turret = GetComponent<Turret>();
+
     }
 
     void Update()
@@ -25,7 +28,15 @@ public class OverSelected : MonoBehaviour
             {
                 _img.enabled = true;
                 _img.transform.Rotate(0, 0, 5 * Time.deltaTime);
+                _img.transform.localScale =
+                    new Vector3(_turret.Range / 2, _turret.Range / 2, 0);
                 isHovering = true;
+                _turret.SetCostText();
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    UpgradeTurret();
+                }
+
                 break;
             }
         }
@@ -33,6 +44,12 @@ public class OverSelected : MonoBehaviour
         if (!isHovering)
         {
             _img.enabled = false;
+            _turret.ExitCostText();
         }
+    }
+
+    void UpgradeTurret()
+    {
+        _turret.Upgrade();
     }
 }

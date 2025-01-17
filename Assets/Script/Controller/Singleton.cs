@@ -8,7 +8,7 @@ public abstract class Singleton<T> : MonoBehaviour where T : Component
 {
     static T instance;
 
-    protected static bool DontDestroy = true;
+    [SerializeField] protected bool DontDestroy = true;
 
     static bool m_applicationIsQuitting;
 
@@ -17,15 +17,16 @@ public abstract class Singleton<T> : MonoBehaviour where T : Component
         if (instance == null)
         {
             instance = this as T;
-            if (DontDestroy) DontDestroyOnLoad(gameObject);
+            if (DontDestroy) DontDestroyOnLoad(this);
         }
         else if (instance != this as T)
         {
-            Destroy(gameObject);
+            Debug.Log("Destroy");
+            Destroy(this);
         }
         else if (DontDestroy)
         {
-            DontDestroyOnLoad(gameObject);
+            DontDestroyOnLoad(this);
         }
     }
 
@@ -46,6 +47,7 @@ public abstract class Singleton<T> : MonoBehaviour where T : Component
                 var obj = new GameObject();
                 obj.name = typeof(T).Name;
                 instance = obj.AddComponent<T>();
+                Debug.Log("Not Exist" + instance);
             }
         }
 

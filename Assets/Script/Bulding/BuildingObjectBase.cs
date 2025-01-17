@@ -21,6 +21,10 @@ public class BuildingObjectBase : ScriptableObject
     [SerializeField] UiCategory uiCategory;
     [SerializeField] TileBase tileBase;
     [SerializeField] PlaceType placeType;
+    [SerializeField] Category CategoryType;
+
+    public Category CategoryType1 => CategoryType;
+
     [SerializeField] bool usePlacementRestriction;
     [SerializeField] List<BuildingCategory> placementRestriction = new List<BuildingCategory>();
     [SerializeField] bool isWall;

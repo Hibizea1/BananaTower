@@ -46,16 +46,21 @@ public class BuildingBoutonHandler : MonoBehaviour, IPointerEnterHandler, IPoint
     {
         SetInformation.GetInstance().Show();
         SetInformation.GetInstance().SetPicture(item.Picture1);
-        if (!item.IsWall)
+        if (!item.IsWall && item.CategoryType1 != Category.Tool)
         {
             Tile itemTile = (Tile)item.Tile;
             Turret turret = itemTile.gameObject.GetComponent<Turret>();
-            SetInformation.GetInstance().SetText(item.name.ToString(), item.BananaCost, turret.Damage, turret.MagazineSize,
+            SetInformation.GetInstance().SetText(item.name.ToString(), item.BananaCost, turret.Damage,
+                turret.MagazineSize,
                 turret.ReloadTime);
+        }
+        else if (item.CategoryType1 != Category.Tool)
+        {
+            SetInformation.GetInstance().SetText(item.name.ToString(), item.BananaCost);
         }
         else
         {
-            SetInformation.GetInstance().SetText(item.name.ToString(), item.BananaCost);
+            SetInformation.GetInstance().SetText(item.name);
         }
     }
 

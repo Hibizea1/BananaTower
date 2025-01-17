@@ -1,12 +1,15 @@
 #region
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Interactions;
 using UnityEngine.Tilemaps;
+using Random = UnityEngine.Random;
 
 #endregion
 
@@ -22,7 +25,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
     [SerializeField] Renderer gridRenderer;
     [SerializeField] float cellSize;
     [SerializeField] BuildingObjectBase pathTile;
-    readonly Dictionary<Vector3Int, Node> _allNodes = new Dictionary<Vector3Int, Node>();
+    Dictionary<Vector3Int, Node> _allNodes = new Dictionary<Vector3Int, Node>();
     BoundsInt _bounds;
 
     Camera _camera;
@@ -41,15 +44,17 @@ public class BuildingCreator : Singleton<BuildingCreator>
     HashSet<Vector3Int> _changedTile = new HashSet<Vector3Int>();
     Stack<Vector3Int> _path;
     Stack<Vector3Int> _pathOld;
+
+
     [SerializeField] List<Vector3Int> PathList = new List<Vector3Int>();
 
-    public Stack<Vector3Int> Path => _path;
 
     List<Vector3Int> _waterTiles = new List<Vector3Int>();
     [SerializeField] List<Vector3Int> _wallTiles = new List<Vector3Int>();
     List<Vector3Int> _turretTiles = new List<Vector3Int>();
     BuildingObjectBase _selectedObj;
     Vector3Int _startPos, _goalPos;
+
 
     TileBase _tileBase;
     TileType _tileType;
@@ -62,6 +67,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
     [SerializeField] int width;
     [SerializeField] int height;
     Vector3Int _holdPosition;
+    [SerializeField] GameObject PausePanel;
 
     #endregion
 
@@ -90,6 +96,67 @@ public class BuildingCreator : Singleton<BuildingCreator>
         }
     }
 
+
+    public Stack<Vector3Int> PathOld
+    {
+        get => _pathOld;
+    }
+
+    public Dictionary<Vector3Int, Node> AllNodes
+    {
+        get => _allNodes;
+    }
+
+    public Node Current
+    {
+        get => _current;
+    }
+
+    public HashSet<Node> OpenNodes
+    {
+        get => _openNodes;
+    }
+
+    public HashSet<Node> ClosedNodes
+    {
+        get => _closedNodes;
+    }
+
+    public HashSet<Vector3Int> ChangedTile
+    {
+        get => _changedTile;
+    }
+
+    public List<Vector3Int> WaterTiles
+    {
+        get => _waterTiles;
+    }
+
+    public List<Vector3Int> WallTiles
+    {
+        get => _wallTiles;
+    }
+
+    public List<Vector3Int> TurretTiles
+    {
+        get => _turretTiles;
+    }
+
+    public Vector3Int StartPos
+    {
+        get => _startPos;
+    }
+
+    public Vector3Int GoalPos
+    {
+        get => _goalPos;
+    }
+
+    public Stack<Vector3Int> Path
+    {
+        get => _path;
+    }
+
     #endregion
 
     #region UnityFunction
@@ -116,31 +183,14 @@ public class BuildingCreator : Singleton<BuildingCreator>
         _eventMaster.CreateNewEvent("ReloadPath");
         _eventMaster.GetEvent("StartPath").AddListener(GetGoalAndStart);
         _eventMaster.GetEvent("ReloadPath").AddListener(Reset);
-        // GetAllWallTiles();
         PlaceWallLineWithRandomHole();
-    }
-
-
-    void GetAllWallTiles()
-    {
-        _wallTiles.Clear();
-
-        foreach (Tilemap tilemap in _mapsPathFinding)
-        {
-            foreach (Vector3Int pos in tilemap.cellBounds.allPositionsWithin)
-            {
-                if (tilemap.GetTile(pos) == wallTile)
-                {
-                    _wallTiles.Add(pos);
-                }
-            }
-        }
     }
 
     void PlaceWallLineWithRandomHole()
     {
         int lineLength = 9; // Length of the wall line
         int randomHoleIndex = Random.Range(0, lineLength); // Random index for the hole
+        int randomHoleIndex2 = Random.Range(0, lineLength); // Random index for the hole
 
         for (int i = -8; i < lineLength; i++)
         {
@@ -149,6 +199,16 @@ public class BuildingCreator : Singleton<BuildingCreator>
                 Vector3Int position = new Vector3Int(-17, i, 0); // Adjust the position as needed
                 defaultMap.SetTile(position, wallTile);
                 _wallTiles.Add(position);
+            }
+        }
+
+        for (int i = -8; i < lineLength; i++)
+        {
+            if (i != randomHoleIndex2)
+            {
+                Vector3Int newPos = new Vector3Int(17, i, 0); // Adjust the position as needed
+                defaultMap.SetTile(newPos, wallTile);
+                _wallTiles.Add(newPos);
             }
         }
     }
@@ -170,9 +230,12 @@ public class BuildingCreator : Singleton<BuildingCreator>
                 if (_holdActive) HandleDrawing();
             }
 
-            Tile turretTile = (Tile)_selectedObj.Tile;
-            GameObject turretGameObject = turretTile.gameObject;
-            turretGameObject.gameObject.GetComponent<Turret>().enabled = false;
+            if (!_selectedObj.IsWall && _selectedObj.CategoryType1 != Category.Tool)
+            {
+                Tile turretTile = (Tile)_selectedObj.Tile;
+                GameObject turretGameObject = turretTile.gameObject;
+                turretGameObject.gameObject.GetComponent<Turret>().enabled = false;
+            }
         }
     }
 
@@ -186,6 +249,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
         _input.Player.MouseRightClick.performed += OnRightClick;
         _input.Player.DebugModeGame.performed += DebugMod;
         _input.Player.AddMoney.performed += SetCoin;
+        _input.Player.Pause.performed += Pause;
         // _input.Player.LoadPathDebug.performed += Reset;
         _input.Player.DebugMode.performed += ShowAndHideDebugMode;
     }
@@ -200,6 +264,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
         _input.Player.MouseLeftClick.canceled -= OnLeftClick;
         _input.Player.DebugModeGame.canceled -= DebugMod;
         _input.Player.AddMoney.canceled -= SetCoin;
+        _input.Player.Pause.canceled -= Pause;
         // _input.Player.LoadPathDebug.performed -= Reset;
         _input.Player.DebugMode.performed += ShowAndHideDebugMode;
         // _pathFinding.RemoveListener(Algorithm);
@@ -210,6 +275,30 @@ public class BuildingCreator : Singleton<BuildingCreator>
         UpdateGridVisual();
     }
 #endif
+
+
+    public void Pause(InputAction.CallbackContext ctx)
+    {
+        if (Time.timeScale == 0)
+        {
+            Time.timeScale = 1;
+            PausePanel.SetActive(false);
+        }
+        else
+        {
+            Time.timeScale = 0;
+            PausePanel.SetActive(true);
+        }
+
+    }
+
+
+    public void LoadData(List<Vector3Int> wallTiles, List<Vector3Int> waterTiles, List<Vector3Int> turretTiles)
+    {
+        _wallTiles = wallTiles;
+        _waterTiles = waterTiles;
+        _turretTiles = turretTiles;
+    }
 
     #endregion
 
@@ -416,7 +505,7 @@ public class BuildingCreator : Singleton<BuildingCreator>
 
     Node GetNode(Vector3Int position)
     {
-        if (_allNodes.ContainsKey(position)) return _allNodes[position];
+        if (_allNodes != null && _allNodes.ContainsKey(position)) return _allNodes[position];
 
         var node = new Node(position);
         _allNodes.Add(position, node);
@@ -669,10 +758,20 @@ public class BuildingCreator : Singleton<BuildingCreator>
             return;
         }
 
-        if (map != previewMap && _selectedObj.GetType() == typeof(BuildingTool))
+        if (_selectedObj.GetType() == typeof(BuildingTool))
         {
             var tool = (BuildingTool)_selectedObj;
             tool.Use(position);
+            if (_wallTiles.Contains(position))
+            {
+                _wallTiles.Remove(position);
+            }
+
+            if (_turretTiles.Contains(position))
+            {
+                _turretTiles.Remove(position);
+            }
+            
         }
         else if (!IsForbidden(position))
         {

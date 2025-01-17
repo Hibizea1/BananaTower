@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
@@ -7,10 +8,17 @@ using UnityEngine.UI;
 public abstract class Turret : MonoBehaviour
 {
     [SerializeField] protected int _damage;
-    [SerializeField] protected int _range;
+    [SerializeField] protected float _range;
     [SerializeField] protected Slider ReloadSlider;
-
+    [SerializeField] protected int UpgradeCost;
+    [SerializeField] protected int IncresedDamagePerUpgrade;
+    [SerializeField] protected int IncresedRangePerUpgrade;
+    [SerializeField] protected float DecreseReloadTimePerUpgrade;
+    [SerializeField] protected int LevelCount;
+    [SerializeField] protected SpriteRenderer _spriteRenderer;
     [SerializeField] protected float _timeToTimeToShoot;
+
+    [SerializeField] protected TextMeshProUGUI CostText;
 
     [SerializeField] protected int _magazineSize;
     [SerializeField] protected float _reloadTime;
@@ -23,7 +31,7 @@ public abstract class Turret : MonoBehaviour
         set => _damage = value;
     }
 
-    public int Range
+    public float Range
     {
         get => _range;
         protected set => _range = value;
@@ -70,20 +78,19 @@ public abstract class Turret : MonoBehaviour
         _reloadTimer = 0;
         _shootTimer = 0;
 
+        ReloadSlider.maxValue = _reloadTime;
+
         _detectionCollider.radius = _range;
-        transform.GetChild(0).localScale = new Vector3(_range * 2, _range * 2, 1);
     }
 
     void Update()
     {
-
-        
         CheckOnReload();
 
         CheckOnShoot();
     }
 
-    public void LoadData(int damage, int range, float shootRate, int magazineSize, float reloadTime, string loadName)
+    public void LoadData(int damage, float range, float shootRate, int magazineSize, float reloadTime, string loadName)
     {
         Damage = damage;
         Range = range;
@@ -91,6 +98,7 @@ public abstract class Turret : MonoBehaviour
         MagazineSize = magazineSize;
         ReloadTime = reloadTime;
         name = loadName;
+        enabled = true;
     }
 
     protected abstract void Shoot();
@@ -99,24 +107,28 @@ public abstract class Turret : MonoBehaviour
     protected virtual void Reload()
     {
         _currentMagazine = MagazineSize;
+        ReloadSlider.gameObject.SetActive(false);
     }
 
-    private void CheckOnReload()
+    protected virtual void CheckOnReload()
     {
         if (_currentMagazine <= 0)
         {
+            ReloadSlider.gameObject.SetActive(true);
             _reloadTimer += Time.deltaTime;
+            ReloadSlider.value = _reloadTimer;
 
             if (_reloadTimer >= ReloadTime)
             {
                 Reload();
                 _reloadTimer = 0.0f;
             }
+
         }
     }
 
     protected abstract void CheckOnShoot();
-    
+
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -129,5 +141,15 @@ public abstract class Turret : MonoBehaviour
     {
         if (other.gameObject.TryGetComponent(out MonkeyBase c))
             _enemiesInRange.Remove(c);
+    }
+
+    public void SetCostText()
+    {
+        CostText.enabled = true;
+        CostText.text =   "Upgrade cost : " + UpgradeCost.ToString();
+    }
+    public void ExitCostText()
+    {
+        CostText.enabled = false;
     }
 }

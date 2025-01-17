@@ -16,6 +16,7 @@ MonoBehaviour:
   uiCategory: {fileID: 11400000, guid: 499823653af7d0d49a720218e89252b6, type: 2}
   tileBase: {fileID: 11400000, guid: c4228ae8c4f02084a98a4ba8b8dcd8c2, type: 2}
   placeType: 1
+  CategoryType: 0
   usePlacementRestriction: 1
   placementRestriction:
   - {fileID: 11400000, guid: 56794ddf5da15934d967c613fb99e3a6, type: 2}
@@ -23,4 +24,4 @@ MonoBehaviour:
   isWall: 0
   isInvisible: 0
   bananaCost: 75
-  Picture: {fileID: -3883517291272413664, guid: abec3a187ba3b6f489c6cbc8ea6e68e5, type: 3}
+  Picture: {fileID: -8610130831691802280, guid: 9418ecca96dd7614186d3acb66648c21, type: 3}

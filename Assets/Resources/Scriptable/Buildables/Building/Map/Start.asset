@@ -16,5 +16,10 @@ MonoBehaviour:
   uiCategory: {fileID: 11400000, guid: 0f3f9bc0255e5e3428a497c7a3237a77, type: 2}
   tileBase: {fileID: 11400000, guid: 9d039bac5301ce94b9170ea6d3b83a56, type: 2}
   placeType: 1
+  CategoryType: 1
   usePlacementRestriction: 0
   placementRestriction: []
+  isWall: 0
+  isInvisible: 0
+  bananaCost: 0
+  Picture: {fileID: 0}
