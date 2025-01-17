@@ -14,9 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   category: {fileID: 11400000, guid: 56794ddf5da15934d967c613fb99e3a6, type: 2}
   uiCategory: {fileID: 11400000, guid: 499823653af7d0d49a720218e89252b6, type: 2}
-  tileBase: {fileID: 11400000, guid: a3f4a2ff3076b964b9190d00799368cf, type: 2}
+  tileBase: {fileID: 11400000, guid: 3454179fc78b9df44bce610a4030dfc2, type: 2}
   placeType: 1
-  usePlacementRestriction: 0
-  placementRestriction: []
+  CategoryType: 0
+  usePlacementRestriction: 1
+  placementRestriction:
+  - {fileID: 11400000, guid: 56794ddf5da15934d967c613fb99e3a6, type: 2}
+  - {fileID: 11400000, guid: 26edb15d8f72864438a164683eebffab, type: 2}
   isWall: 0
   isInvisible: 0
+  bananaCost: 20
+  Picture: {fileID: 558069313713883153, guid: 77b9459b68138ff4694d8f10b1b17d14, type: 3}

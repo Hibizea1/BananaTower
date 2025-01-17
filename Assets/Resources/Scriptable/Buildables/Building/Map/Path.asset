@@ -13,10 +13,13 @@ MonoBehaviour:
   m_Name: Path
   m_EditorClassIdentifier: 
   category: {fileID: 11400000, guid: 57d1069d85a327247b53cd1ef2db299c, type: 2}
-  uiCategory: {fileID: 11400000, guid: 0f3f9bc0255e5e3428a497c7a3237a77, type: 2}
+  uiCategory: {fileID: 0}
   tileBase: {fileID: 11400000, guid: 37871f6bbd400d342976f11283e164d4, type: 2}
   placeType: 1
+  CategoryType: 1
   usePlacementRestriction: 0
   placementRestriction: []
   isWall: 0
   isInvisible: 1
+  bananaCost: 0
+  Picture: {fileID: 0}

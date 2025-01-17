@@ -130,6 +130,33 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "DebugModeGame",
+                    "type": "Button",
+                    "id": "e75974d3-409e-4a8d-a4c2-8bc8638786bf",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "AddMoney",
+                    "type": "Button",
+                    "id": "5e88a2b5-034d-4a90-96af-fa8d113fde0b",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Pause",
+                    "type": "Button",
+                    "id": "1176685e-4001-486f-b73a-08721a593a95",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -594,6 +621,83 @@
                     "action": "DebugMode",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "One Modifier",
+                    "id": "a1315aba-a880-4082-b3af-115690e8037b",
+                    "path": "OneModifier",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "DebugModeGame",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "modifier",
+                    "id": "65dad164-61c9-4e3a-9d56-acda6db5ce01",
+                    "path": "<Keyboard>/shift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "DebugModeGame",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "binding",
+                    "id": "7855dfbe-6f0d-4834-8f09-afd4b573d8f6",
+                    "path": "<Keyboard>/k",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "DebugModeGame",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "One Modifier",
+                    "id": "f39ebd33-25f7-42fb-815c-c32305f10c14",
+                    "path": "OneModifier",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "AddMoney",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "modifier",
+                    "id": "43891f9b-2a73-423f-b387-c20dd3ae50cd",
+                    "path": "<Keyboard>/ctrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "AddMoney",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "binding",
+                    "id": "859f56ef-81a8-4f11-bb33-1b03f8429333",
+                    "path": "<Keyboard>/v",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "AddMoney",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "bc1418b4-a919-4e5c-a2b6-811b307fa00f",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Pause",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },

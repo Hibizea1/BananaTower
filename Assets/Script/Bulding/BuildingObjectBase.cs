@@ -21,13 +21,29 @@ public class BuildingObjectBase : ScriptableObject
     [SerializeField] UiCategory uiCategory;
     [SerializeField] TileBase tileBase;
     [SerializeField] PlaceType placeType;
+    [SerializeField] Category CategoryType;
+
+    public Category CategoryType1 => CategoryType;
+
     [SerializeField] bool usePlacementRestriction;
     [SerializeField] List<BuildingCategory> placementRestriction = new List<BuildingCategory>();
     [SerializeField] bool isWall;
     [SerializeField] bool isInvisible;
+    [SerializeField] int bananaCost;
+    [SerializeField] Sprite Picture;
+    bool _isInPreview;
+
+    public bool IsInPreview
+    {
+        get => _isInPreview;
+        set => _isInPreview = value;
+    }
+
+    public Sprite Picture1 => Picture;
 
     public bool IsInvisible => isInvisible;
-
+    public int BananaCost => bananaCost;
+    
     public bool IsWall => isWall;
 
     public List<BuildingCategory> PlacementRestriction =>

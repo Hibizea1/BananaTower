@@ -1,50 +1,93 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
+using UnityEngine.Tilemaps;
 
 public class BagaSinge : MonkeyBase
 {
-    Stack<Vector3Int> _path = new Stack<Vector3Int>();
-
-    Vector3Int _currentNode;
+    List<Vector3Int> _path = new List<Vector3Int>();
+    [SerializeField] List<Vector3Int> Path = new List<Vector3Int>();
+    [SerializeField] Vector3Int _currentNode;
 
     void Start()
     {
-        _path = BuildingCreator.GetInstance().Path;
+        InitializePath();
+        _currentHealth = _health;
+        HealthSlider.maxValue = _health;
+        HealthSlider.value = _currentHealth;
     }
 
     void Update()
     {
-        if (_path == null)
+        if (_path == null || _path.Count == 0)
         {
-            _path = BuildingCreator.GetInstance().Path;
+            InitializePath();
         }
 
-        if (_path != null)
+        if (_path != null && _path.Count > 0)
         {
             Move();
         }
+
+        HealthSlider.value = _currentHealth;
     }
 
+    void InitializePath()
+    {
+        _path = new List<Vector3Int>(BuildingCreator.GetInstance().Path);
+        Path = new List<Vector3Int>(_path);
+        if (_path.Count > 0)
+        {
+            _currentNode = _path[0];
+            _path.RemoveAt(0);
+        }
+        else
+        {
+            Debug.LogWarning("Path is empty for " + transform.name);
+        }
+    }
 
     protected override void Move()
     {
         base.Move();
-        if (_path.Count > 0 && Vector3.Distance(transform.position, _currentNode) < 0.01f)
+        if (_path.Count > 0 && Vector3.Distance(transform.position, _currentNode + new Vector3(0.5f, 0.5f, 0)) < 0.01f)
         {
-            _currentNode = _path.Pop();
+            _currentNode = _path[0];
+            _path.RemoveAt(0);
         }
 
         if (_path.Count > 0)
         {
-            Vector3 direction = (_currentNode - transform.position).normalized;
+            Vector3 direction = (_currentNode + new Vector3(0.5f, 0.5f, 0) - transform.position).normalized;
             transform.position += direction * Speed * Time.deltaTime;
         }
+        else
+        {
+            Debug.LogWarning("No more nodes to follow for " + transform.name);
+        }
+
+        CheckIfAtGoal();
+    }
+
+    void CheckIfAtGoal()
+    {
+        foreach (Tilemap tilemap in BuildingCreator.GetInstance().MapsPathFinding)
+        {
+            if (tilemap.GetTile(_currentNode) is AStarTile tile && tile.Type == TileType.Goal)
+            {
+                DealDamage();
+            }
+        }
+    }
+
+    protected override void DealDamage()
+    {
+        EventMaster.GetInstance().InvokeEventInt("HeartDamage", _damage);
+        Die();
     }
 
     public override void SpecialAbility()
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
 }

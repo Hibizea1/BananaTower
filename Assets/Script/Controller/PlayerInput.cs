@@ -152,6 +152,33 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""DebugModeGame"",
+                    ""type"": ""Button"",
+                    ""id"": ""e75974d3-409e-4a8d-a4c2-8bc8638786bf"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""AddMoney"",
+                    ""type"": ""Button"",
+                    ""id"": ""5e88a2b5-034d-4a90-96af-fa8d113fde0b"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Pause"",
+                    ""type"": ""Button"",
+                    ""id"": ""1176685e-4001-486f-b73a-08721a593a95"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -616,6 +643,83 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
                     ""action"": ""DebugMode"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""One Modifier"",
+                    ""id"": ""a1315aba-a880-4082-b3af-115690e8037b"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DebugModeGame"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""modifier"",
+                    ""id"": ""65dad164-61c9-4e3a-9d56-acda6db5ce01"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DebugModeGame"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""7855dfbe-6f0d-4834-8f09-afd4b573d8f6"",
+                    ""path"": ""<Keyboard>/k"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DebugModeGame"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""One Modifier"",
+                    ""id"": ""f39ebd33-25f7-42fb-815c-c32305f10c14"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""AddMoney"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""modifier"",
+                    ""id"": ""43891f9b-2a73-423f-b387-c20dd3ae50cd"",
+                    ""path"": ""<Keyboard>/ctrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""AddMoney"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""859f56ef-81a8-4f11-bb33-1b03f8429333"",
+                    ""path"": ""<Keyboard>/v"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""AddMoney"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""bc1418b4-a919-4e5c-a2b6-811b307fa00f"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Pause"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -1215,6 +1319,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         m_Player_MousePosition = m_Player.FindAction("MousePosition", throwIfNotFound: true);
         m_Player_LoadPathDebug = m_Player.FindAction("LoadPathDebug", throwIfNotFound: true);
         m_Player_DebugMode = m_Player.FindAction("DebugMode", throwIfNotFound: true);
+        m_Player_DebugModeGame = m_Player.FindAction("DebugModeGame", throwIfNotFound: true);
+        m_Player_AddMoney = m_Player.FindAction("AddMoney", throwIfNotFound: true);
+        m_Player_Pause = m_Player.FindAction("Pause", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1308,6 +1415,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_MousePosition;
     private readonly InputAction m_Player_LoadPathDebug;
     private readonly InputAction m_Player_DebugMode;
+    private readonly InputAction m_Player_DebugModeGame;
+    private readonly InputAction m_Player_AddMoney;
+    private readonly InputAction m_Player_Pause;
     public struct PlayerActions
     {
         private @PlayerInput m_Wrapper;
@@ -1326,6 +1436,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         public InputAction @MousePosition => m_Wrapper.m_Player_MousePosition;
         public InputAction @LoadPathDebug => m_Wrapper.m_Player_LoadPathDebug;
         public InputAction @DebugMode => m_Wrapper.m_Player_DebugMode;
+        public InputAction @DebugModeGame => m_Wrapper.m_Player_DebugModeGame;
+        public InputAction @AddMoney => m_Wrapper.m_Player_AddMoney;
+        public InputAction @Pause => m_Wrapper.m_Player_Pause;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1377,6 +1490,15 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @DebugMode.started += instance.OnDebugMode;
             @DebugMode.performed += instance.OnDebugMode;
             @DebugMode.canceled += instance.OnDebugMode;
+            @DebugModeGame.started += instance.OnDebugModeGame;
+            @DebugModeGame.performed += instance.OnDebugModeGame;
+            @DebugModeGame.canceled += instance.OnDebugModeGame;
+            @AddMoney.started += instance.OnAddMoney;
+            @AddMoney.performed += instance.OnAddMoney;
+            @AddMoney.canceled += instance.OnAddMoney;
+            @Pause.started += instance.OnPause;
+            @Pause.performed += instance.OnPause;
+            @Pause.canceled += instance.OnPause;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -1423,6 +1545,15 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
             @DebugMode.started -= instance.OnDebugMode;
             @DebugMode.performed -= instance.OnDebugMode;
             @DebugMode.canceled -= instance.OnDebugMode;
+            @DebugModeGame.started -= instance.OnDebugModeGame;
+            @DebugModeGame.performed -= instance.OnDebugModeGame;
+            @DebugModeGame.canceled -= instance.OnDebugModeGame;
+            @AddMoney.started -= instance.OnAddMoney;
+            @AddMoney.performed -= instance.OnAddMoney;
+            @AddMoney.canceled -= instance.OnAddMoney;
+            @Pause.started -= instance.OnPause;
+            @Pause.performed -= instance.OnPause;
+            @Pause.canceled -= instance.OnPause;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -1619,6 +1750,9 @@ public partial class @PlayerInput: IInputActionCollection2, IDisposable
         void OnMousePosition(InputAction.CallbackContext context);
         void OnLoadPathDebug(InputAction.CallbackContext context);
         void OnDebugMode(InputAction.CallbackContext context);
+        void OnDebugModeGame(InputAction.CallbackContext context);
+        void OnAddMoney(InputAction.CallbackContext context);
+        void OnPause(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {

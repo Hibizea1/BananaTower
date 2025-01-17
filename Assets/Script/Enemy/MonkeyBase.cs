@@ -1,11 +1,15 @@
+using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 public abstract class MonkeyBase : MonoBehaviour
 {
-    [SerializeField] private int _damage;
-    [SerializeField] private int _health;
-    [SerializeField] private int _bananasOnDeath;
-    [SerializeField] private float _speed;
+    [SerializeField] protected int _damage;
+    [SerializeField] protected int _health;
+    [SerializeField] protected int _currentHealth;
+    [SerializeField] protected int _bananasOnDeath;
+    [SerializeField] protected float _speed;
+    [SerializeField] protected Slider HealthSlider;
 
     #region PropertySettings
 
@@ -35,6 +39,10 @@ public abstract class MonkeyBase : MonoBehaviour
 
     #endregion
 
+    void Awake()
+    {
+        EventMaster.GetInstance().CreateNewEvent("SetUpPath");
+    }
 
     private void Update()
     {
@@ -48,16 +56,26 @@ public abstract class MonkeyBase : MonoBehaviour
 
     public virtual void TakeDamage(int damageTaken)
     {
-        if (_health - damageTaken > 0)
-            _health -= damageTaken;
+        if (_currentHealth - damageTaken > 0)
+            _currentHealth -= damageTaken;
         else
+        {
+            EventMaster.GetInstance().InvokeEventInt("AddMoney", _bananasOnDeath);
             Die();
+        }
     }
 
-    private void Die()
+    protected void Die()
     {
         //TODO : monkey death
+        WaveManager.GetInstance().EnemyCount--;
+        EventMaster.GetInstance().InvokeEvent("CheckCount");
         Destroy(gameObject);
+    }
+
+    protected virtual void DealDamage()
+    {
+
     }
 
     public abstract void SpecialAbility();

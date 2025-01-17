@@ -1,28 +1,37 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(CircleCollider2D))]
 public abstract class Turret : MonoBehaviour
 {
-    [SerializeField] private int _damage;
-    [SerializeField] private int _range;
+    [SerializeField] protected int _damage;
+    [SerializeField] protected float _range;
+    [SerializeField] protected Slider ReloadSlider;
+    [SerializeField] protected int UpgradeCost;
+    [SerializeField] protected int IncresedDamagePerUpgrade;
+    [SerializeField] protected int IncresedRangePerUpgrade;
+    [SerializeField] protected float DecreseReloadTimePerUpgrade;
+    [SerializeField] protected int LevelCount;
+    [SerializeField] protected SpriteRenderer _spriteRenderer;
+    [SerializeField] protected float _timeToTimeToShoot;
 
-    [FormerlySerializedAs("_timeToShoot")] [SerializeField]
-    private float _timeToTimeToShoot;
+    [SerializeField] protected TextMeshProUGUI CostText;
 
-    [SerializeField] private int _magazineSize;
-    [SerializeField] private float _reloadTime;
+    [SerializeField] protected int _magazineSize;
+    [SerializeField] protected float _reloadTime;
 
     #region PropertySettings
 
     public int Damage
     {
         get => _damage;
-        protected set => _damage = value;
+        set => _damage = value;
     }
 
-    public int Range
+    public float Range
     {
         get => _range;
         protected set => _range = value;
@@ -49,16 +58,18 @@ public abstract class Turret : MonoBehaviour
     #endregion
 
 
-    private int _currentMagazine;
+    protected int _currentMagazine;
 
-    private float _reloadTimer;
-    private float _shootTimer;
+    protected float _reloadTimer;
+    protected float _shootTimer;
 
-    private CircleCollider2D _detectionCollider;
+    protected CircleCollider2D _detectionCollider;
 
-    [SerializeField] private List<MonkeyBase> _enemiesInRange;
+    [SerializeField] protected List<MonkeyBase> _enemiesInRange;
 
-    private void Start()
+    public List<MonkeyBase> EnemiesInRange { get; protected set; }
+
+    protected virtual void Start()
     {
         _enemiesInRange = new List<MonkeyBase>();
         _detectionCollider = GetComponent<CircleCollider2D>();
@@ -66,6 +77,8 @@ public abstract class Turret : MonoBehaviour
         _currentMagazine = _magazineSize;
         _reloadTimer = 0;
         _shootTimer = 0;
+
+        ReloadSlider.maxValue = _reloadTime;
 
         _detectionCollider.radius = _range;
     }
@@ -77,7 +90,7 @@ public abstract class Turret : MonoBehaviour
         CheckOnShoot();
     }
 
-    public void LoadData(int damage, int range, float shootRate, int magazineSize, float reloadTime, string loadName)
+    public void LoadData(int damage, float range, float shootRate, int magazineSize, float reloadTime, string loadName)
     {
         Damage = damage;
         Range = range;
@@ -85,47 +98,36 @@ public abstract class Turret : MonoBehaviour
         MagazineSize = magazineSize;
         ReloadTime = reloadTime;
         name = loadName;
+        enabled = true;
     }
 
-    protected virtual void Shoot()
-    {
-        _enemiesInRange[0].TakeDamage(_damage);
-        //TODO : Instantiate projectile maybe deal damage with projectile
-        Debug.Log("Bang");
-    }
+    protected abstract void Shoot();
     public abstract void Upgrade();
 
     protected virtual void Reload()
     {
         _currentMagazine = MagazineSize;
+        ReloadSlider.gameObject.SetActive(false);
     }
 
-    private void CheckOnReload()
+    protected virtual void CheckOnReload()
     {
         if (_currentMagazine <= 0)
         {
+            ReloadSlider.gameObject.SetActive(true);
             _reloadTimer += Time.deltaTime;
+            ReloadSlider.value = _reloadTimer;
 
             if (_reloadTimer >= ReloadTime)
             {
                 Reload();
                 _reloadTimer = 0.0f;
             }
+
         }
     }
 
-    private void CheckOnShoot()
-    {
-        if (_enemiesInRange.Count > 0 && _currentMagazine > 0)
-        {
-            _shootTimer += Time.deltaTime;
-            if (_shootTimer >= TimeToShoot)
-            {
-                Shoot();
-                _shootTimer = 0.0f;
-            }
-        }
-    }
+    protected abstract void CheckOnShoot();
 
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -139,5 +141,15 @@ public abstract class Turret : MonoBehaviour
     {
         if (other.gameObject.TryGetComponent(out MonkeyBase c))
             _enemiesInRange.Remove(c);
+    }
+
+    public void SetCostText()
+    {
+        CostText.enabled = true;
+        CostText.text =   "Upgrade cost : " + UpgradeCost.ToString();
+    }
+    public void ExitCostText()
+    {
+        CostText.enabled = false;
     }
 }

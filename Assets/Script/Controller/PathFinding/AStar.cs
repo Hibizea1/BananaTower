@@ -11,7 +11,8 @@ public enum TileType
     Water,
     Grass,
     Path,
-    Turret
+    Turret,
+    Wall
 }
 
 public class AStar : MonoBehaviour
