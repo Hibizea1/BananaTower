@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41f7653873e0071449521948dbd09438, type: 3}
+  m_Name: Wall
+  m_EditorClassIdentifier: 
+  category: {fileID: 11400000, guid: 26edb15d8f72864438a164683eebffab, type: 2}
+  uiCategory: {fileID: 11400000, guid: 455edb219eade9646b76ae14a59d7f48, type: 2}
+  tileBase: {fileID: 11400000, guid: a02a16566e039d34ab58ed4bcfe497c3, type: 2}
+  placeType: 1
+  CategoryType: 1
+  usePlacementRestriction: 1
+  placementRestriction:
+  - {fileID: 11400000, guid: 56794ddf5da15934d967c613fb99e3a6, type: 2}
+  - {fileID: 11400000, guid: 26edb15d8f72864438a164683eebffab, type: 2}
+  isWall: 1
+  isInvisible: 0
+  bananaCost: 30
+  Picture: {fileID: -1325016350855266070, guid: 411650f9a122db94583cb8671815dddc, type: 3}
